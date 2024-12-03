@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: identity-service
+  profiles:
+    active: database
+  datasource:
+    url: jdbc:postgresql://identity_db:5432/identity_db
+    username: my_user
+    password: 12345
+  jpa:
+    properties:
+      hibernate:
+        default_schema: public
+        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+  liquibase:
+    change-log: db.changelog_2/main-changelog_2.xml
+
+# kafka:
+#   producer:
+#     bootstrap-servers: localhost:9092, localhost:9094
+#     key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#     value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#     acks: all
+#     properties:
+#       delivery.timeout.ms: 20000
+#       linger.ms: 0
+#       request.timeout.ms: 10000
+#       enable.idempotence: true
+
+server:
+  port: 8088
+
+eureka:
+  client:
+    registryFetchIntervalSeconds: 10
+    service-url:
+      defaultZone: http://discoveryservice:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE

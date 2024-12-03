@@ -1,0 +1,37 @@
+services:
+  identity_db:
+    container_name: identity_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: identity_db
+    ports:
+      - "5433:5432"
+
+  discoveryservice:
+    image: dockerfile-discoveryservice:0.0.1
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_APPLICATION_NAME: discoveryservice
+      SERVER_PORT: 8761
+      EUREKA_INSTANCE_HOSTNAME: discoveryservice
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+
+  api-gateway:
+    image: dockerfile-apigateway:0.0.1
+    ports:
+      - "8082:8082"
+    depends_on:
+      - discoveryservice
+      - identity-service
+
+  identity-service:
+    image: dockerfile-identity:0.0.1
+    ports:
+      - "8088:8088"
+    depends_on:
+      - identity_db
+      - discoveryservice
