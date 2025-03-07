@@ -10,6 +10,17 @@ services:
     ports:
       - "5433:5432"
 
+  account_db:
+    container_name: account_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: account_db
+    ports:
+      - "5431:5432"
+
   discoveryservice:
     image: dockerfile-discoveryservice:0.0.1
     ports:
@@ -34,4 +45,12 @@ services:
       - "8088:8088"
     depends_on:
       - identity_db
+      - discoveryservice
+
+  account-service:
+    image: dockerfile-account:0.0.1
+    ports:
+      - "8099:8099"
+    depends_on:
+      - account_db
       - discoveryservice

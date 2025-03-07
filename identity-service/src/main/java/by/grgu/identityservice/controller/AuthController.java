@@ -7,6 +7,8 @@ import by.grgu.identityservice.database.entity.User;
 import by.grgu.identityservice.exceptions.ErrorMessage;//import com.example.demo.events.AuthUserGotEvent;
 import by.grgu.identityservice.service.UserService;
 import by.grgu.identityservice.utils.JwtTokenUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -18,7 +20,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +36,12 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
+
+    @GetMapping("/registration")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("createUserRequest", new CreateUserRequest());
+        return "registration";
+    }
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegistrationRequest request) {
@@ -81,4 +91,26 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
+    }
+
+    @GetMapping("/exit")
+    public String showExitPage() {
+        return "logout";
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+
+        return "logout";
+    }
+
 }
