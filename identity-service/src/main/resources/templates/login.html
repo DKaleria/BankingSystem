@@ -1,11 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Вход</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        body {
+            background: linear-gradient(to right, #007BFF, #2ED573); /* Градиент фона */
+            color: white; /* Цвет текста на фоне */
+        }
         .warning {
             color: red;
+        }
+        .btn-primary {
+            background-color: #007BFF; /* Синий цвет */
+            border-color: #007BFF; /* Синий цвет границы */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3; /* Темно-синий при наведении */
+            border-color: #004085; /* Темно-синий цвет границы при наведении */
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон для карточки */
+            color: black; /* Черный текст внутри карточки */
         }
     </style>
 </head>
@@ -13,23 +30,23 @@
 <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
     <div class="card w-400">
         <div class="card-body">
-            <h1 class="card-title text-center mb-4">Login</h1>
+            <h1 class="card-title text-center mb-4">Вход</h1>
             <form th:action="@{/login}" method="post">
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username">Имя пользователя</label>
                     <input type="text" class="form-control" id="username" name="username" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">Пароль</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <div th:if="${param.error}" class="warning">
-                    Invalid username or password.
+                    Неверное имя пользователя или пароль.
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
             </form>
             <div class="text-center mt-3">
-                <p>Don't have an account? <a th:href="@{/registration}">Register here</a></p>
+                <p>Нет аккаунта? <a th:href="@{/registration}" style="color: #007BFF;">Зарегистрируйтесь здесь</a></p>
             </div>
         </div>
     </div>

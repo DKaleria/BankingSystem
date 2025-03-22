@@ -5,7 +5,6 @@ import by.grgu.identityservice.database.entity.AccountRequest;
 import by.grgu.identityservice.database.entity.CustomUserDetails;
 import by.grgu.identityservice.database.entity.RegistrationRequest;
 import by.grgu.identityservice.database.entity.User;
-import by.grgu.identityservice.database.entity.enumm.Role;
 import by.grgu.identityservice.database.repository.UserRepository;
 import by.grgu.identityservice.usecaseses.mapper.AuthUserMapper;
 import org.slf4j.Logger;
@@ -25,10 +24,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -40,7 +37,8 @@ public class UserService implements UserDetailsService {
     private final AuthUserMapper authUserMapper;
     private final RestTemplate restTemplate;
     //    private KafkaTemplate<String, AuthUserGotEvent> kafkaTemplate;
-    private final String ACCOUNT_SERVICE_URL = "http://account-service/accounts";
+    // private final String ACCOUNT_SERVICE_URL = "http://account-service/accounts";
+    private final String ACCOUNT_SERVICE_URL = "http://localhost:8099/accounts";
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthUserMapper authUserMapper, RestTemplate restTemplate) {
         this.userRepository = userRepository;
@@ -54,8 +52,7 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("User already exists");
         }
 
-        User user = authUserMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = authUserMapper.toUser(request, passwordEncoder);
         createAccountForUser(user);
 
         return userRepository.save(user);

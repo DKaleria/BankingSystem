@@ -2,26 +2,22 @@ package by.grgu.accountservice.service.impl;
 
 import by.grgu.accountservice.database.entity.Account;
 import by.grgu.accountservice.database.entity.AccountRequest;
+import by.grgu.accountservice.database.enumm.Role;
 import by.grgu.accountservice.database.repository.AccountRepository;
 import by.grgu.accountservice.service.AccountService;
-import by.grgu.accountservice.usecasses.mapper.AccountMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
-    private final AccountMapper accountMapper;
 
-    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper) {
+    public AccountServiceImpl(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-        this.accountMapper = accountMapper;
     }
 
     public ResponseEntity<Void> createAccount(AccountRequest request) {
@@ -29,7 +25,7 @@ public class AccountServiceImpl implements AccountService {
             return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
         }
 
-        Account account = accountMapper.toAccount(request);
+        Account account = mapToAccount(request);
         accountRepository.save(account);
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
@@ -49,8 +45,30 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.deleteByUsername(username);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
-    
+
     private boolean accountExists(String username) {
         return accountRepository.findByUsername(username).isPresent();
+    }
+
+    private Account mapToAccount(AccountRequest request) {
+        Account account = new Account();
+        account.setUsername(request.getUsername());
+        account.setBirthDate(request.getBirthDate());
+        account.setFirstname(request.getFirstname());
+        account.setLastname(request.getLastname());
+        account.setPassword(request.getPassword());
+        account.setEmail(request.getEmail());
+        account.setRegistrationDate(LocalDate.now()); // Установите текущую дату
+        account.setActive(request.isActive());
+        account.setRole(mapRole(request.getRole())); // Логика маппинга роли
+        return account;
+    }
+
+    private Role mapRole(String role) {
+        try {
+            return Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
     }
 }

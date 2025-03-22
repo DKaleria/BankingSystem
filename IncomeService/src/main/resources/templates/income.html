@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои доходы</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc); /* Синий-фиолетовый градиент */
+            color: white; /* Цвет текста на фоне */
+        }
+        .welcome-text {
+            font-size: 2rem; /* Размер шрифта */
+            font-weight: 700; /* Жирный шрифт */
+            text-align: center; /* Центрирование текста */
+            margin-bottom: 20px; /* Отступ снизу */
+        }
+        .card {
+            margin-bottom: 20px; /* Отступы между карточками */
+            border-radius: 10px; /* Закругленные углы карточек */
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон для карточек */
+            color: black; /* Черный текст внутри карточек */
+        }
+        .card-title {
+            color: #6a11cb; /* Цвет заголовков карточек */
+        }
+        .btn-custom {
+            background-color: #2575fc; /* Цвет кнопки */
+            border: none; /* Убираем границу */
+            color: white; /* Цвет текста */
+            border-radius: 5px; /* Закругленные углы */
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            font-weight: bold; /* Жирный шрифт */
+            transition: background-color 0.3s, transform 0.3s; /* Плавные переходы */
+        }
+        .btn-custom:hover {
+            background-color: #1a5bb8; /* Темно-синий при наведении */
+            transform: scale(1.05); /* Увеличение кнопки при наведении */
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Финансовый менеджер</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/account">Мой аккаунт</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/incomes">Мои доходы</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/expenses">Мои расходы</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/assets">Мои активы</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/liabilities">Мои обязательства</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/compare">Сравнение расходов</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/recommendations">Рекомендации</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/reports">Генерация отчетов</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Выйти</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h1 class="welcome-text">Мои доходы</h1>
+
+    <form action="/incomes" method="get">
+        <div class="form-row align-items-center">
+            <div class="col-auto">
+                <label>Выберите тип доходов:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="incomeType" id="allIncomes" value="all" checked>
+                    <label class="form-check-label" for="allIncomes">Все доходы</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="incomeType" id="monthlyIncomes" value="monthly">
+                    <label class="form-check-label" for="monthlyIncomes">Доходы за месяц</label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <label for="month">Месяц</label>
+                <select class="form-control" id="month" name="month">
+                    <option value="">Выберите месяц</option>
+                    <option value="1">Январь</option>
+                    <option value="2">Февраль</option>
+                    <option value="3">Март</option>
+                    <option value="4">Апрель</option>
+                    <option value="5">Май</option>
+                    <option value="6">Июнь</option>
+                    <option value="7">Июль</option>
+                    <option value="8">Август</option>
+                    <option value="9">Сентябрь</option>
+                    <option value="10">Октябрь</option>
+                    <option value="11">Ноябрь</option>
+                    <option value="12">Декабрь</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="year">Год</label>
+                <input type="number" class="form-control" id="year" name="year" value="${currentYear}" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-custom">Получить доходы</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Добавить доход</h5>
+                    <form th:action="@{/add-income}" method="post">
+                        <div class="form-group">
+                            <label for="incomeDate">Дата</label>
+                            <input type="date" class="form-control" id="incomeDate" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="incomeAmount">Сумма</label>
+                            <input type="number" class="form-control" id="incomeAmount" name="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="incomeSource">Источник</label>
+                            <input type="text" class="form-control" id="incomeSource" name="source" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="incomeDescription">Описание</label>
+                            <input type="text" class="form-control" id="incomeDescription" name="description" required>
+                        </div>
+                        <input type="hidden" name="userId" th:value="${userId}" />
+                        <button type="submit" class="btn btn-custom">Добавить доход</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Список доходов</h5>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Сумма</th>
+                            <th>Источник</th>
+                            <th>Описание</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="income : ${incomes}">
+                            <td th:text="${income.date}"></td>
+                            <td th:text="${income.amount}"></td>
+                            <td th:text="${income.source}"></td>
+                            <td th:text="${income.description}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(incomes)}">
+                            <td colspan="4" class="text-center">Добавьте доходы, чтобы они отображались здесь.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

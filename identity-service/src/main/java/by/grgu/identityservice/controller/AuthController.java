@@ -39,7 +39,7 @@ public class AuthController {
 
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("createUserRequest", new CreateUserRequest());
+        model.addAttribute("createUserRequest", new RegistrationRequest());
         return "registration";
     }
 

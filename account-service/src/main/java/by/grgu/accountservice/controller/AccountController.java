@@ -5,6 +5,7 @@ import by.grgu.accountservice.database.entity.AccountRequest;
 import by.grgu.accountservice.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,6 +32,11 @@ public class AccountController {
     @DeleteMapping("/{username}")
     public ResponseEntity<Void> deleteAccount(@PathVariable String username) {
         return accountService.deleteAccount(username);
+    }
+    @GetMapping("/account")
+    public String showAccount(@SessionAttribute("user") Account account, Model model) {
+        model.addAttribute("username", account.getUsername());
+        return "account";
     }
 
 }
