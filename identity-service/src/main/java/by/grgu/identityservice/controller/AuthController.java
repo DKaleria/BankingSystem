@@ -21,13 +21,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 
-@RestController
+@Controller
 @AllArgsConstructor
 @Transactional
 @RequestMapping("/identity")
@@ -45,9 +46,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegistrationRequest request) {
+        System.out.println("Register method called");
+        System.out.println("Password in controller  method: "+ request.getPassword());
         User user = userService.register(request);
         return ResponseEntity.ok(user);
     }
+
     @GetMapping("/users")
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('ADMIN')")

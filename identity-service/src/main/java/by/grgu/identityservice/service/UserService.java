@@ -47,13 +47,36 @@ public class UserService implements UserDetailsService {
         this.restTemplate = restTemplate;
     }
 
-    public User register(RegistrationRequest request) {
+    /*public User register(RegistrationRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
 
         User user = authUserMapper.toUser(request, passwordEncoder);
         createAccountForUser(user);
+
+        return userRepository.save(user);
+    }*/
+
+    public User register(RegistrationRequest request) {
+        System.out.println("Registration Request: " + request);
+
+        if (request.getPassword() == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
+
+        System.out.println("Password: " + request.getPassword());
+
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        User user = authUserMapper.toUser(request, passwordEncoder);
+        System.out.println("User after mapping: " + user);
+
+        createAccountForUser(user);
+
+
 
         return userRepository.save(user);
     }
@@ -73,6 +96,7 @@ public class UserService implements UserDetailsService {
                 .registrationDate(LocalDate.now())
                 .active(true)
                 .role(user.getRole())
+                .password(user.getPassword())
                 .build();
         ResponseEntity<Void> response = restTemplate.exchange(
                 ACCOUNT_SERVICE_URL,

@@ -22,6 +22,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/identity/register",
+                                "/identity/login",
+                                "/identity/registration",
                                 "/identity/authenticate",
                                 "/identity/validate-token")
                         .permitAll()

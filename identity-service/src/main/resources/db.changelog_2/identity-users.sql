@@ -8,5 +8,6 @@ CREATE TABLE users (
                        firstname VARCHAR(20),
                        lastname VARCHAR(20),
                        password VARCHAR(120) NOT NULL,
+                       email VARCHAR(255),
                        role VARCHAR(10) NOT NULL CHECK (role IN ('USER', 'ADMIN', 'MANAGER'))
 );

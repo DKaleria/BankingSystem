@@ -6,15 +6,14 @@ spring:
   datasource:
     # url: jdbc:postgresql://account_db:5432/account_db
     url: jdbc:postgresql://localhost:5432/account_db
+    dialect: org.hibernate.dialect.PostgreSQLDialect
     username: my_user
     password: 12345
-    driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
         default_schema: public
         ddl-auto: update
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: true
   liquibase:
