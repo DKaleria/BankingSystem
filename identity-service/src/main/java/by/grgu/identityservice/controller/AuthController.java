@@ -40,6 +40,8 @@ public class AuthController {
 
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
+        System.out.println("Страница регистрации вызывается");
+        System.out.println("Registration page called");
         model.addAttribute("createUserRequest", new RegistrationRequest());
         return "registration";
     }
