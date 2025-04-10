@@ -21,13 +21,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public ResponseEntity<Void> createAccount(AccountRequest request) {
+        System.out.println("Аккаунт реквест: "+ request);
         if (accountExists(request.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
         }
 
         Account account = mapToAccount(request);
         accountRepository.save(account);
-
+        System.out.println("Аккаунт готов: "+ account);
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
     }
 

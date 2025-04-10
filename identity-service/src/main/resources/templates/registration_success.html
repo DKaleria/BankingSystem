@@ -1,8 +1,40 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru">
 <head>
-    <title>Registration Successful</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация успешна</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #4facfe, #00f2fe); /* Градиент фона */
+            color: #212529; /* Цвет текста */
+            font-family: 'Arial', sans-serif; /* Шрифт */
+        }
+
+        .card {
+            border-radius: 10px; /* Углы карточки */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Тень для карточки */
+        }
+
+        .card-title {
+            color: #007BFF; /* Цвет заголовка */
+        }
+
+        .btn-primary {
+            background-color: #007BFF; /* Основной цвет кнопки */
+            border-color: #007BFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3; /* Цвет кнопки при наведении */
+            border-color: #0056b3;
+        }
+
+        .margin-top {
+            margin-top: 20px; /* Отступ сверху */
+        }
+    </style>
 </head>
 <body>
 <div class="container my-5">
@@ -10,12 +42,12 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h1 class="card-title text-center mb-4">Registration Successful!</h1>
+                    <h1 class="card-title text-center mb-4">Регистрация успешна!</h1>
                     <p class="card-text text-center">
-                        Thank you for registering with our application. Your account has been created successfully.
+                        Спасибо за регистрацию в нашем приложении. Ваш аккаунт был успешно создан.
                     </p>
-                    <div class="text-center">
-                        <a th:href="@{/login}" class="btn btn-primary">Go to Login</a>
+                    <div class="text-center margin-top">
+                        <a th:href="@{/identity/login}" class="btn btn-primary btn-block">Перейти к входу</a>
                     </div>
                 </div>
             </div>

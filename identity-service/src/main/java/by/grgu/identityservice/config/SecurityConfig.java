@@ -20,6 +20,8 @@ public class SecurityConfig {
     private static final String[] WHITELIST = {
             "/identity/register",
             "/identity/login",
+            "/identity/logout",
+            "/identity/exit",
             "/identity/registration",
             "/identity/authenticate",
             "/identity/validate-token"

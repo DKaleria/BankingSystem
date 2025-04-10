@@ -46,6 +46,11 @@ public class AuthController {
         return "registration";
     }
 
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
+    }
+
     @GetMapping("/main")
     public String showMainPage() {
         return "main";
@@ -58,7 +63,7 @@ public class AuthController {
 
         User user = userService.register(request);
 
-        return "redirect:/identity/login";
+        return "registration_success";
     }
 
 //    @PostMapping("/register")
@@ -113,11 +118,6 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "login";
-    }
-
     @GetMapping("/exit")
     public String showExitPage() {
         return "logout";
@@ -125,6 +125,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("Метод выхода вызывается");
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null) {
