@@ -52,7 +52,6 @@
                 return false;
             }
 
-            // Простой пример валидации email
             if (!/\S+@\S+\.\S+/.test(email)) {
                 errorMessageElem.innerText = 'Неверный формат электронной почты';
                 event.preventDefault();
@@ -71,7 +70,7 @@
 
 <div class="container mt-5">
     <h1 class="mb-4 text-center" style="color: #212529;">Регистрация</h1>
-    <form id="registrationForm" action="/api/register" method="post" class="registration-form">
+    <form id="registrationForm" action="/identity/register" method="post" class="registration-form">
         <div class="form-group">
             <label for="username">Имя пользователя:</label>
             <input type="text" class="form-control" id="username" name="username" required>
@@ -121,7 +120,7 @@
 
     <div class="text-center mt-3">
         <p>
-            <a href="/exit" class="text-white">Выход</a>
+            <a href="identity/exit" class="text-white">Выход</a>
         </p>
     </div>
 </div>

@@ -16,6 +16,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
   liquibase:
     change-log: db.changelog_2/main-changelog_2.xml
 
@@ -52,3 +55,4 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
+

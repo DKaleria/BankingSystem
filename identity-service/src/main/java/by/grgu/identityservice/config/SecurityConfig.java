@@ -13,26 +13,39 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfig {
+
     private final JwtTokenFilter jwtTokenFilter;
+
+    private static final String[] WHITELIST = {
+            "/identity/register",
+            "/identity/login",
+            "/identity/registration",
+            "/identity/authenticate",
+            "/identity/validate-token"
+    };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/identity/register",
-                                "/identity/login",
-                                "/identity/registration",
-                                "/identity/authenticate",
-                                "/identity/validate-token")
+                        .requestMatchers(WHITELIST)
                         .permitAll()
-                        .requestMatchers("/users").hasAnyAuthority("ADMIN")
+                        .requestMatchers("/identity/users").hasAnyAuthority("ADMIN")
                         .anyRequest()
                         .authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-
+                .formLogin(
+                        login -> login
+                                .loginPage("/identity/login")
+                                .defaultSuccessUrl("/identity/main", true)
+                                .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/identity/logout")
+                        .logoutSuccessUrl("/identity/login")
+                        .permitAll())
                 .build();
     }
 }

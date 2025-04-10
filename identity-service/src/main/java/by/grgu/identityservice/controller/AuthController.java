@@ -46,13 +46,27 @@ public class AuthController {
         return "registration";
     }
 
+    @GetMapping("/main")
+    public String showMainPage() {
+        return "main";
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegistrationRequest request) {
+    public ResponseEntity<User> register(@ModelAttribute RegistrationRequest request) {
+        // Проверяем, что метод вызывается
         System.out.println("Register method called");
-        System.out.println("Password in controller  method: "+ request.getPassword());
+        System.out.println("Password in controller method: " + request.getPassword());
         User user = userService.register(request);
         return ResponseEntity.ok(user);
     }
+
+//    @PostMapping("/register")
+//    public ResponseEntity<User> register(@RequestBody RegistrationRequest request) {
+//        System.out.println("Register method called");
+//        System.out.println("Password in controller  method: "+ request.getPassword());
+//        User user = userService.register(request);
+//        return ResponseEntity.ok(user);
+//    }
 
     @GetMapping("/users")
     @Transactional(readOnly = true)

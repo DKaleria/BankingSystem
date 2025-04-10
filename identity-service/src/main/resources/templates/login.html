@@ -31,7 +31,7 @@
     <div class="card w-400">
         <div class="card-body">
             <h1 class="card-title text-center mb-4">Вход</h1>
-            <form th:action="@{/login}" method="post">
+            <form th:action="@{/identity/login}" method="post">
                 <div class="form-group">
                     <label for="username">Имя пользователя</label>
                     <input type="text" class="form-control" id="username" name="username" required>
@@ -46,7 +46,7 @@
                 <button type="submit" class="btn btn-primary btn-block">Войти</button>
             </form>
             <div class="text-center mt-3">
-                <p>Нет аккаунта? <a th:href="@{/registration}" style="color: #007BFF;">Зарегистрируйтесь здесь</a></p>
+                <p>Нет аккаунта? <a th:href="@{/identity/registration}" style="color: #007BFF;">Зарегистрируйтесь здесь</a></p>
             </div>
         </div>
     </div>
