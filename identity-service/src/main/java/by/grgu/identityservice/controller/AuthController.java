@@ -52,12 +52,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@ModelAttribute RegistrationRequest request) {
-        // Проверяем, что метод вызывается
+    public String register(@ModelAttribute RegistrationRequest request) {
         System.out.println("Register method called");
         System.out.println("Password in controller method: " + request.getPassword());
+
         User user = userService.register(request);
-        return ResponseEntity.ok(user);
+
+        return "redirect:/identity/login";
     }
 
 //    @PostMapping("/register")
