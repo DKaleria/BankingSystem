@@ -1,6 +1,6 @@
-package by.grgu.identityservice.config;
+package by.grgu.accountservice.config;
 
-import by.grgu.identityservice.service.UserService;
+import by.grgu.accountservice.service.impl.AccountServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,14 +11,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AuthenticationManagerConfig {
-    private final UserService userService;
+    private final AccountServiceImpl accountService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthenticationManagerConfig(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
+    public AuthenticationManagerConfig(AccountServiceImpl accountService, PasswordEncoder passwordEncoder) {
+        this.accountService = accountService;
         this.passwordEncoder = passwordEncoder;
     }
 
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
         return authConfiguration.getAuthenticationManager();
@@ -27,26 +28,8 @@ public class AuthenticationManagerConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userService);
+        provider.setUserDetailsService(accountService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
-
-   /* @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
-        return authConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(getUserDetailsService());
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
-
-    @Bean
-    public UserDetailsService getUserDetailsService() {
-        return userService;
-    }*/
 }

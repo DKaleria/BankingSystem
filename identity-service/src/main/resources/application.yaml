@@ -56,3 +56,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
 
+jwt:
+  access-token-validity: PT5H
+  refresh-token-validity: P30D
+  secret: T42d4f6a685f536563cD7572655f4b657fff9

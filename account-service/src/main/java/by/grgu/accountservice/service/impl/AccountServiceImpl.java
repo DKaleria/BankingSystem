@@ -7,12 +7,19 @@ import by.grgu.accountservice.database.repository.AccountRepository;
 import by.grgu.accountservice.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepository;
 
@@ -21,14 +28,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public ResponseEntity<Void> createAccount(AccountRequest request) {
-        System.out.println("Аккаунт реквест: "+ request);
+        System.out.println("Аккаунт реквест: " + request);
         if (accountExists(request.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
         }
 
         Account account = mapToAccount(request);
         accountRepository.save(account);
-        System.out.println("Аккаунт готов: "+ account);
+        System.out.println("Аккаунт готов: " + account);
         return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
     }
 
@@ -71,5 +78,23 @@ public class AccountServiceImpl implements AccountService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid role: " + role);
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(account.getRole().name()));
+
+        return new org.springframework.security.core.userdetails.User(
+                account.getUsername(),
+                account.getPassword(),
+                account.isActive(), // Активен ли аккаунт
+                true, // accountNonExpired - не истек ли срок действия учетной записи (если false, то истек)
+                true, // credentialsNonExpired - не истекли ли учетные данные (пароль) (если false, то истек)
+                true, // accountNonLocked - не заблокирована ли учетная запись  (если false, то заблокирована)
+                authorities
+        );
     }
 }

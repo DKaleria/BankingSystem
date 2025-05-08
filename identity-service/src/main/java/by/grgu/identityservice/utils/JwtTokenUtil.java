@@ -1,60 +1,61 @@
 package by.grgu.identityservice.utils;
 
-import by.grgu.identityservice.exceptions.ErrorMessage;
+import by.grgu.identityservice.config.JwtConfig;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
+import java.time.Duration;
 import java.util.*;
-
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.stream.Collectors;
 import javax.xml.bind.DatatypeConverter;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
-    private static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60; // 5 hours
-    private final String secret = "T42d4f6a685f536563cD7572655f4b657fff9";
+    private final JwtConfig jwtConfig;
 
-    public String generateToken(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return generateToken(userDetails);
+    public String generateAccessToken(Authentication authentication) {
+        return generateToken(authentication, jwtConfig.accessTokenValidity());
     }
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority) .peek(role -> System.out.println("Role: " + role)) // Логирование для проверки
-                .collect(Collectors.toList());
+    public String generateRefreshToken(Authentication authentication) {
+        return generateToken(authentication, jwtConfig.refreshTokenValidity());
+    }
 
-        claims.put("roles", roles);
+    private String generateToken(Authentication authentication, Duration validity) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return generateToken(userDetails, validity);
+    }
 
+    private String generateToken(UserDetails userDetails, Duration validity) {
         return Jwts.builder()
-                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, DatatypeConverter.parseBase64Binary(secret))
+                .setExpiration(new Date(System.currentTimeMillis() + validity.toMillis()))
+                .signWith(SignatureAlgorithm.HS512, DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(secret)).parseClaimsJws(token);
-            return true;
+            Claims claims = Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
+                    .parseClaimsJws(token).getBody();
+
+            // Проверяем, не истек ли срок действия токена
+            return !claims.getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
-
     public String getUsernameFromToken(String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
@@ -63,7 +64,7 @@ public class JwtTokenUtil {
         }
     }
 
-    public Object getRolesFromToken(String token) {
+    /*public Object getRolesFromToken(String token) {
         try {
             Object rolesObj = Jwts.parser()
                     .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
@@ -85,5 +86,5 @@ public class JwtTokenUtil {
         } catch (JwtException e) {
             return new ErrorMessage(new Date(), "Ошибка валидации токена: " + e.getMessage());
         }
-    }
+    }*/
 }

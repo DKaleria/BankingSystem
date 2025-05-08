@@ -10,7 +10,7 @@
             color: white; /* Цвет текста на фоне */
         }
         .warning {
-            color: red;
+            color: red; /* Цвет для сообщений об ошибках */
         }
         .btn-primary {
             background-color: #007BFF; /* Синий цвет */
@@ -31,7 +31,7 @@
     <div class="card w-400">
         <div class="card-body">
             <h1 class="card-title text-center mb-4">Вход</h1>
-            <form th:action="@{/identity/login}" method="post">
+            <form th:action="@{/identity/authenticate}" method="post">
                 <div class="form-group">
                     <label for="username">Имя пользователя</label>
                     <input type="text" class="form-control" id="username" name="username" required>
@@ -40,8 +40,8 @@
                     <label for="password">Пароль</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <div th:if="${param.error}" class="warning">
-                    Неверное имя пользователя или пароль.
+                <div th:if="${error}" class="warning">
+                    <p th:text="${error}">Неверное имя пользователя или пароль.</p>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Войти</button>
             </form>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Добро пожаловать в пиццерию!</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container my-5">
+  <h1 class="text-center mb-4">Добро пожаловать в нашу пиццерию!</h1>
+  <p class="lead text-center">Мы рады приветствовать вас в нашем уютном заведении, где вы сможете насладиться вкуснейшими пиццами, приготовленными с любовью.</p>
+
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Наше меню</h3>
+          <p class="card-text">Ознакомьтесь с нашим разнообразным меню и выберите свою любимую пиццу.</p>
+          <a href="/menu" class="btn btn-primary">Перейти к меню</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Сделайте заказ</h3>
+          <p class="card-text">Оформите заказ прямо сейчас и наслаждайтесь нашей вкусной пиццей.</p>
+          <a href="/order" class="btn btn-primary">Сделать заказ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <p>
+      <a th:href="@{/exit}">Выход</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>

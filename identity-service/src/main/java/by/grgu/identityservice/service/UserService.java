@@ -1,12 +1,11 @@
 package by.grgu.identityservice.service;
 
 //import com.example.demo.events.AuthUserGotEvent;
-import by.grgu.identityservice.database.entity.AccountRequest;
-import by.grgu.identityservice.database.entity.CustomUserDetails;
-import by.grgu.identityservice.database.entity.RegistrationRequest;
-import by.grgu.identityservice.database.entity.User;
+
+import by.grgu.identityservice.database.entity.*;
 import by.grgu.identityservice.database.repository.UserRepository;
 import by.grgu.identityservice.usecaseses.mapper.AuthUserMapper;
+import by.grgu.identityservice.utils.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -24,8 +23,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -35,28 +37,20 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private final AuthUserMapper authUserMapper;
+    private final JwtTokenUtil jwtTokenUtil;
     private final RestTemplate restTemplate;
     //    private KafkaTemplate<String, AuthUserGotEvent> kafkaTemplate;
     // private final String ACCOUNT_SERVICE_URL = "http://account-service/accounts";
     private final String ACCOUNT_SERVICE_URL = "http://localhost:8099/accounts";
+    private final String GATEWAY_SERVICE_URL = "http://localhost:8082/gateway/update-token";
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthUserMapper authUserMapper, RestTemplate restTemplate) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthUserMapper authUserMapper, JwtTokenUtil jwtTokenUtil, RestTemplate restTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authUserMapper = authUserMapper;
+        this.jwtTokenUtil = jwtTokenUtil;
         this.restTemplate = restTemplate;
     }
-
-    /*public User register(RegistrationRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("User already exists");
-        }
-
-        User user = authUserMapper.toUser(request, passwordEncoder);
-        createAccountForUser(user);
-
-        return userRepository.save(user);
-    }*/
 
     public User register(RegistrationRequest request) {
         System.out.println("Registration Request: " + request);
@@ -65,18 +59,13 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Password cannot be null");
         }
 
-        System.out.println("Password: " + request.getPassword());
-
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
 
         User user = authUserMapper.toUser(request, passwordEncoder);
         System.out.println("User after mapping: " + user);
-
         createAccountForUser(user);
-
-
 
         return userRepository.save(user);
     }
@@ -98,6 +87,7 @@ public class UserService implements UserDetailsService {
                 .role(user.getRole())
                 .password(user.getPassword())
                 .build();
+        System.out.println("createAccountForUser: " + accountRequest);
         ResponseEntity<Void> response = restTemplate.exchange(
                 ACCOUNT_SERVICE_URL,
                 HttpMethod.POST,
@@ -108,7 +98,7 @@ public class UserService implements UserDetailsService {
         if (response.getStatusCode().is2xxSuccessful()) {
             System.out.println("Account successfully created for user: " + accountRequest.getUsername());
         } else if (response.getStatusCode().value() == 409) {
-            throw new IllegalArgumentException("Account already exists for user: " + accountRequest.getUsername());
+            throw new IllegalArgumentException("Account already exists for user: " + accountRequest.toString());
         } else {
             throw new RuntimeException("Failed to create account for user: " + accountRequest.getUsername());
         }
@@ -136,4 +126,51 @@ public class UserService implements UserDetailsService {
         }
         throw new RuntimeException("Authentication is not valid");
     }
-}
+
+    public void sendToken(String username, String token) {
+        System.out.println("Отправка токена: " + token + " для пользователя: " + username);
+
+        sendTokenToApiGateway(username, token);
+    }
+
+    private void sendTokenToApiGateway(String username, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("username", username);
+        headers.set("token", token);
+
+        System.out.println("Заголовки перед отправкой в API Gateway: " + headers);
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<Void> response = restTemplate.postForEntity(GATEWAY_SERVICE_URL, requestEntity, Void.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("Токен успешно отправлен в API Gateway");
+            } else {
+                System.out.println("Ошибка при отправке токена в API Gateway: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка при отправке токена в API Gateway: " + e.getMessage());
+        }
+    }
+
+    /*private void sendTokenToApiGateway(String username, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("username", username);
+        headers.set("token", token);
+
+        System.out.println("Заголовки перед отправкой в API Gateway: " + headers);
+
+        restTemplate.postForEntity(GATEWAY_SERVICE_URL, null, Void.class, headers);
+    }*/
+
+    /*private void sendTokenToApiGateway(String username, String token) {
+        Map<String, String> request = new HashMap<>();
+        request.put("username", username);
+        request.put("token", token);
+
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request);
+        System.out.println("request in UserService send token: "+ request);
+        restTemplate.postForEntity(GATEWAY_SERVICE_URL, entity, Void.class);
+    }*/
+    }

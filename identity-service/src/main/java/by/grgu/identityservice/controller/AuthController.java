@@ -4,7 +4,7 @@ import by.grgu.identityservice.database.entity.AuthenticationRequest;
 import by.grgu.identityservice.database.entity.AuthenticationResponse;
 import by.grgu.identityservice.database.entity.RegistrationRequest;
 import by.grgu.identityservice.database.entity.User;
-import by.grgu.identityservice.exceptions.ErrorMessage;//import com.example.demo.events.AuthUserGotEvent;
+import by.grgu.identityservice.exceptions.ErrorMessage;
 import by.grgu.identityservice.service.UserService;
 import by.grgu.identityservice.utils.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +39,11 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
+
+    @GetMapping("/main")
+    public String showMainPage() {
+        return "main";
+    }
 
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
@@ -51,28 +58,16 @@ public class AuthController {
         return "login";
     }
 
-    @GetMapping("/main")
-    public String showMainPage() {
-        return "main";
-    }
-
     @PostMapping("/register")
-    public String register(@ModelAttribute RegistrationRequest request) {
+    public String register(@ModelAttribute RegistrationRequest request,
+                                           HttpServletResponse response) {
         System.out.println("Register method called");
         System.out.println("Password in controller method: " + request.getPassword());
 
-        User user = userService.register(request);
+        userService.register(request);
 
         return "registration_success";
     }
-
-//    @PostMapping("/register")
-//    public ResponseEntity<User> register(@RequestBody RegistrationRequest request) {
-//        System.out.println("Register method called");
-//        System.out.println("Password in controller  method: "+ request.getPassword());
-//        User user = userService.register(request);
-//        return ResponseEntity.ok(user);
-//    }
 
     @GetMapping("/users")
     @Transactional(readOnly = true)
@@ -83,6 +78,94 @@ public class AuthController {
     }
 
     @SneakyThrows
+    @PostMapping("/authenticate")
+    public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
+        System.out.println("Authenticate method called with username: " + username);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            if (authentication.isAuthenticated()) {
+                String accessToken = jwtTokenUtil.generateAccessToken(authentication);
+                String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
+
+                System.out.println("Отправка токена в UserService");
+                userService.sendToken(username, accessToken);
+
+                // Перенаправление на страницу аккаунта
+                return "redirect:http://localhost:8082/accounts/accountD";
+            }
+        } catch (BadCredentialsException e) {
+            redirectAttributes.addFlashAttribute("error", "Неверное имя пользователя или пароль.");
+        }
+
+        // Перенаправление на страницу логина с ошибкой
+        return "redirect:/identity/login";
+    }
+/*
+    @PostMapping("/authenticate")
+    public AuthenticationResponse authenticate(@RequestParam String username, @RequestParam String password) {
+        System.out.println("Authenticate method called with username: " + username);
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (authentication.isAuthenticated()) {
+            String accessToken = jwtTokenUtil.generateAccessToken(authentication);
+            String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
+
+            System.out.println("Отправка токена в UserService");
+            userService.sendToken(username, accessToken);
+
+            return new AuthenticationResponse(accessToken, refreshToken);
+        } else {
+            throw new RuntimeException("invalid access");
+        }
+    }
+    */
+
+   /* @SneakyThrows
+    @PostMapping("/authenticate")
+    public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest request) {
+        System.out.println("Authenticate method called with username: " + request.getUsername());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (authentication.isAuthenticated()) {
+            String accessToken = jwtTokenUtil.generateAccessToken(authentication);
+            String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
+
+
+            System.out.println("Отправка токена в UserService");
+            userService.sendToken(request.getUsername(), accessToken);
+
+            return new AuthenticationResponse(accessToken, refreshToken);
+        } else {
+            throw new RuntimeException("invalid access");
+        }
+    }*/
+
+
+
+    /*@SneakyThrows
+    @PostMapping("/authenticate")
+    public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (authentication.isAuthenticated()) {
+            String accessToken = jwtTokenUtil.generateAccessToken(authentication);
+            String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
+            return new AuthenticationResponse(accessToken, refreshToken);
+        } else {
+            throw new RuntimeException("invalid access");
+        }
+    }*/
+
+
+    /*@SneakyThrows
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -95,7 +178,7 @@ public class AuthController {
         }else {
             throw new RuntimeException("invalid access");
         }
-    }
+    }*/
 
     @GetMapping("/me")
     public ResponseEntity<Object> getCurrentUser() {
@@ -133,7 +216,7 @@ public class AuthController {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
 
-        return "logout";
+        return "login";
     }
 
 }
