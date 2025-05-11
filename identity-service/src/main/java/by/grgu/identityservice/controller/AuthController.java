@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -193,13 +194,23 @@ public class AuthController {
     }
 
     @GetMapping("/validate-token")
+    public ResponseEntity<Void> validateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        if (jwtTokenUtil.validateToken(authorization.substring(7))) {  // Убираем "Bearer "
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+
+    /*@GetMapping("/validate-token")
     public ResponseEntity<Void> validateToken(@RequestParam("Authorization") String authorization) {
         if (jwtTokenUtil.validateToken(authorization)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-    }
+    }*/
 
     @GetMapping("/exit")
     public String showExitPage() {

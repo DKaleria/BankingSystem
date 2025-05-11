@@ -1,14 +1,14 @@
 package by.grgu.identityservice.utils;
 
 import by.grgu.identityservice.config.JwtConfig;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import javax.xml.bind.DatatypeConverter;
@@ -40,7 +40,7 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+   /* public boolean validateToken(String token) {
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
@@ -51,7 +51,26 @@ public class JwtTokenUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }*/
+
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getExpiration().after(new Date());  // Проверяем, не истек ли срок
+        } catch (ExpiredJwtException e) {
+            System.out.println("Ошибка: токен истек!");
+            return false;
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("Ошибка: токен недействителен!");
+            return false;
+        }
     }
+
+
     public String getUsernameFromToken(String token) {
         try {
             return Jwts.parser()

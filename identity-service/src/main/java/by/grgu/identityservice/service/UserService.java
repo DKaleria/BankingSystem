@@ -23,11 +23,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -135,6 +132,28 @@ public class UserService implements UserDetailsService {
 
     private void sendTokenToApiGateway(String username, String token) {
         HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        headers.set("username", username);  // Добавляем username в заголовки
+
+        System.out.println("Заголовки перед отправкой в API Gateway: " + headers);
+
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<Void> response = restTemplate.postForEntity(GATEWAY_SERVICE_URL, requestEntity, Void.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("Токен успешно отправлен в API Gateway");
+            } else {
+                System.out.println("Ошибка при отправке токена в API Gateway: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка при отправке токена в API Gateway: " + e.getMessage());
+        }
+    }
+
+
+    /*private void sendTokenToApiGateway(String username, String token) {
+        HttpHeaders headers = new HttpHeaders();
         headers.set("username", username);
         headers.set("token", token);
 
@@ -152,7 +171,7 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             System.err.println("Ошибка при отправке токена в API Gateway: " + e.getMessage());
         }
-    }
+    }*/
 
     /*private void sendTokenToApiGateway(String username, String token) {
         HttpHeaders headers = new HttpHeaders();
