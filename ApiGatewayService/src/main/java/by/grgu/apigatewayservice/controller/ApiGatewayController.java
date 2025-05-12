@@ -1,19 +1,15 @@
 package by.grgu.apigatewayservice.controller;
 
-import by.grgu.apigatewayservice.database.entity.UserToken;
-import by.grgu.apigatewayservice.service.ApiGatewayService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/gateway")
 public class ApiGatewayController {
-    private HttpHeaders savedHeaders = new HttpHeaders(); // ✅ Переменная для хранения заголовков
+    private HttpHeaders savedHeaders = new HttpHeaders();
 
     @PostMapping("/update-token")
     public ResponseEntity<Void> updateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,

@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .formLogin(
                         login -> login
                                 .loginPage("/identity/login")
-                                .defaultSuccessUrl("http://localhost:8082/accounts/accountD", true)
+                                .defaultSuccessUrl("http://localhost:8082/accounts/account", true) // ✅ Перенаправляем на /accounts/account
                                 .permitAll()
                 )
                 .logout(logout -> logout

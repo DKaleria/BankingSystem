@@ -2,73 +2,83 @@ package by.grgu.incomeservice.service.impl;
 
 import by.grgu.incomeservice.database.entity.Income;
 import by.grgu.incomeservice.database.repository.IncomeRepository;
+import by.grgu.incomeservice.service.IncomeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Service
-public class IncomeServiceImpl {
+public class IncomeServiceImpl implements IncomeService {
 
     private final IncomeRepository incomeRepository;
+    private final RestTemplate restTemplate; // ✅ Добавляем RestTemplate
 
     @Autowired
-    public IncomeServiceImpl(IncomeRepository incomeRepository) {
+    public IncomeServiceImpl(IncomeRepository incomeRepository, RestTemplate restTemplate) {
         this.incomeRepository = incomeRepository;
+        this.restTemplate = restTemplate;
     }
 
-    /**
-     * Получить общий доход за указанный месяц и год.
-     *
-     * @param userId идентификатор пользователя
-     * @param month  месяц (1-12)
-     * @param year   год
-     * @return общий доход
-     */
-    public BigDecimal getTotalIncomeForMonth(UUID userId, int month, int year) {
+    @Override
+    public Income createIncome(Income income) {
+        String birthDateUrl = "http://localhost:8082/accounts/" + income.getUsername() + "/birthdate";
+        ResponseEntity<LocalDate> response = restTemplate.getForEntity(birthDateUrl, LocalDate.class);
+
+        if (response.getStatusCode().isError() || response.getBody() == null) {
+            throw new IllegalArgumentException("❌ Ошибка: Не удалось получить дату рождения!");
+        }
+
+        LocalDate birthDate = response.getBody();
+
+        if (income.getDate().isBefore(birthDate)) {
+            throw new IllegalArgumentException("❌ Ошибка: доход не может быть записан до рождения!");
+        }
+
+        return incomeRepository.save(income);
+    }
+
+
+    @Override
+    public List<Income> getAllIncomes(String username) {
+        return incomeRepository.findByUsername(username);
+    }
+
+    @Override
+    public BigDecimal getTotalIncomeForMonth(String username, int month, int year) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
-        List<Income> incomes = incomeRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+        List<Income> incomes = incomeRepository.findByUsernameAndDateBetween(username, startDate, endDate);
         return incomes.stream()
-                .map(Income::getAmount)
+                .map(income -> BigDecimal.valueOf(income.getAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    /**
-     * Получить список доходов за указанный месяц и год.
-     *
-     * @param userId идентификатор пользователя
-     * @param month  месяц (1-12)
-     * @param year   год
-     * @return список доходов
-     */
-    public List<Income> getIncomesForMonth(UUID userId, int month, int year) {
+    @Override
+    public List<Income> getIncomesForMonth(String username, int month, int year) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
-        return incomeRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+        System.out.println("📌 Запрос доходов с " + startDate + " по " + endDate);
+
+        return incomeRepository.getIncomesForMonth(username, startDate, endDate);
     }
 
-    /**
-     * Получить список всех доходов пользователя.
-     *
-     * @param userId идентификатор пользователя
-     * @return список доходов
-     */
-    public List<Income> getAllIncomes(UUID userId) {
-        return incomeRepository.findByUserId(userId);
+    @Override
+    public BigDecimal getTotalIncomeForUser(String username) {
+        System.out.println("📌 Запрос общей суммы доходов пользователя: " + username);
+
+        List<Income> incomes = incomeRepository.findByUsername(username);
+
+        return incomes.stream()
+                .map(income -> BigDecimal.valueOf(income.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    /**
-     * Сохранить новый доход.
-     *
-     * @param income новый доход
-     * @return сохраненный доход
-     */
-    public Income saveIncome(Income income) {
-        return incomeRepository.save(income);
-    }
+
 }

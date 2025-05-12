@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои доходы</title>
+    <title>Мои расходы</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -63,12 +63,12 @@
 </nav>
 
 <div class="container mt-4">
-    <h1 class="welcome-text">Мои доходы</h1>
+    <h1 class="welcome-text">Мои расходы</h1>
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
         <strong th:text="${errorMessage}"></strong>
     </div>
 
-    <form th:action="@{/incomes/monthly}" method="get" class="mb-4">
+    <form th:action="@{/expenses/monthly}" method="get" class="mb-4">
         <div class="form-row align-items-center">
             <div class="col-auto">
                 <label for="month">Месяц</label>
@@ -93,7 +93,7 @@
                 <input type="number" class="form-control" id="year" name="year" value="${currentYear}" required>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-custom">Получить доходы за месяц</button>
+                <button type="submit" class="btn btn-custom">Получить расходы за месяц</button>
             </div>
         </div>
     </form>
@@ -102,41 +102,41 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Добавить доход</h5>
-                    <form th:action="@{/incomes/add-income}" method="post">
+                    <h5 class="card-title">Добавить расход</h5>
+                    <form th:action="@{/expenses/add-expense}" method="post">
                         <div class="form-group">
-                            <label for="incomeDate">Дата</label>
-                            <input type="date" class="form-control" id="incomeDate" name="date" required>
+                            <label for="expenseDate">Дата</label>
+                            <input type="date" class="form-control" id="expenseDate" name="date" required>
                         </div>
                         <div class="form-group">
-                            <label for="incomeAmount">Сумма</label>
-                            <input type="number" class="form-control" id="incomeAmount" name="amount" required>
+                            <label for="expenseAmount">Сумма</label>
+                            <input type="number" class="form-control" id="expenseAmount" name="amount" required>
                         </div>
                         <div class="form-group">
-                            <label for="incomeSource">Источник</label>
-                            <input type="text" class="form-control" id="incomeSource" name="source" required>
+                            <label for="expenseSource">Источник</label>
+                            <input type="text" class="form-control" id="expenseSource" name="source" required>
                         </div>
                         <div class="form-group">
-                            <label for="incomeDescription">Описание</label>
-                            <input type="text" class="form-control" id="incomeDescription" name="description" required>
+                            <label for="expenseDescription">Описание</label>
+                            <input type="text" class="form-control" id="expenseDescription" name="description" required>
                         </div>
                         <input type="hidden" name="username" th:value="${username}"/>
-                        <button type="submit" class="btn btn-custom">Добавить доход</button>
+                        <button type="submit" class="btn btn-custom">Добавить расход</button>
                     </form>
                 </div>
             </div>
         </div>
 
         <div class="mb-4">
-            <form th:action="@{/incomes/user-incomes}" method="get">
-                <button type="submit" class="btn btn-custom">Посмотреть все доходы</button>
+            <form th:action="@{/expenses/user-expenses}" method="get">
+                <button type="submit" class="btn btn-custom">Посмотреть все расходы</button>
             </form>
         </div>
 
         <div class="col-md-12 mt-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Список доходов</h5>
+                    <h5 class="card-title">Список расходов</h5>
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -147,14 +147,14 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="income : ${incomes}">
-                            <td th:text="${income.date}"></td>
-                            <td th:text="${income.amount}"></td>
-                            <td th:text="${income.source}"></td>
-                            <td th:text="${income.description}"></td>
+                        <tr th:each="expense : ${expenses}">
+                            <td th:text="${expense.date}"></td>
+                            <td th:text="${expense.amount}"></td>
+                            <td th:text="${expense.source}"></td>
+                            <td th:text="${expense.description}"></td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(incomes)}">
-                            <td colspan="4" class="text-center">Добавьте доходы, чтобы они отображались здесь.</td>
+                        <tr th:if="${#lists.isEmpty(expenses)}">
+                            <td colspan="4" class="text-center">Добавьте расходы, чтобы они отображались здесь.</td>
                         </tr>
                         </tbody>
                     </table>

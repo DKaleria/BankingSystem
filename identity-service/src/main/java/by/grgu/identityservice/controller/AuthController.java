@@ -95,7 +95,7 @@ public class AuthController {
                 userService.sendToken(username, accessToken);
 
                 // Перенаправление на страницу аккаунта
-                return "redirect:http://localhost:8082/accounts/accountD";
+                return "redirect:http://localhost:8082/accounts/account";
             }
         } catch (BadCredentialsException e) {
             redirectAttributes.addFlashAttribute("error", "Неверное имя пользователя или пароль.");

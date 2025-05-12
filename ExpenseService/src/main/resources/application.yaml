@@ -1,10 +1,10 @@
 spring:
   application:
-    name: income-service
+    name: expense-service
   profiles:
     active: database
   datasource:
-    url: jdbc:postgresql://localhost:5432/income_db
+    url: jdbc:postgresql://localhost:5432/expense_db
     username: my_user
     password: 12345
   jpa:
@@ -16,31 +16,18 @@ spring:
         format_sql: true
         show_sql: true
   liquibase:
-    change-log: db.changelog_3/main_changelog.xml
+    change-log: db.changelog_4/main-changelog_4.xml
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
 
-# kafka:
-#   producer:
-#     bootstrap-servers: localhost:9092, localhost:9094
-#     key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#     value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#     acks: all
-#     properties:
-#       delivery.timeout.ms: 20000
-#       linger.ms: 0
-#       request.timeout.ms: 10000
-#       enable.idempotence: true
-
 server:
-  port: 8070
+  port: 8071
 
 eureka:
   client:
     registryFetchIntervalSeconds: 10
     service-url:
-      # defaultZone: http://discoveryservice:8761/eureka
       defaultZone: http://localhost:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
