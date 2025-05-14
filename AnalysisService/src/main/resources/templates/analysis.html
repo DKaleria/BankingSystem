@@ -136,16 +136,11 @@
         <button type="submit" class="btn btn-primary">Получить данные</button>
     </form>
 
-    <h2>Баланс: <span th:text="${balance}">—</span></h2>
-    <h2>Процент расходов: <span th:text="${expensePercentage}">—</span></h2>
+    <h2 style="color: #4cce50;">Баланс: <span th:text="${balance}">—</span></h2>
+    <h2 style="color: #ff522c;">Процент расходов: <span th:text="${expensePercentage}" %>—</span></h2>
 
-    <h2>Детали доходов и расходов</h2>
     <div class="container mt-4">
-        <h1 class="text-center">Анализ расходов и доходов</h1>
-
-        <h2 style="color: #4CAF50;">Баланс: <span th:text="${balance}">—</span></h2>
-        <h2 style="color: #FF5733;">Процент расходов: <span th:text="${expensePercentage}"%>—</span></h2>
-
+        <h1 class="text-center">Детали доходов и расходов</h1>
         <table class="table table-striped" id="dataTable">
             <thead>
             <tr>
@@ -182,7 +177,6 @@
     </div>
 
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -190,12 +184,10 @@
         var jsonData = [];
         var headers = [];
 
-        // 📌 Читаем заголовки таблицы
         for (var i = 0; i < table.rows[0].cells.length; i++) {
             headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase();
         }
 
-        // 📌 Читаем значения из таблицы
         for (var i = 1; i < table.rows.length; i++) {
             var tableRow = table.rows[i];
             var rowData = {};
@@ -205,47 +197,50 @@
             jsonData.push(rowData);
         }
 
-        // 📌 Формируем массивы для графика
-        var labels = jsonData.map(function (e) { return e.категория; });
-        var values = jsonData.map(function (e) { return parseFloat(e.сумма); });
+        var labels = [...new Set(jsonData.map(e => e.категория))];
+        var incomeValues = labels.map(category => jsonData.filter(e => e.тип === 'Доход' && e.категория === category)
+            .reduce((sum, e) => sum + parseFloat(e.сумма), 0));
+        var expenseValues = labels.map(category => jsonData.filter(e => e.тип === 'Расход' && e.категория === category)
+            .reduce((sum, e) => sum + parseFloat(e.сумма), 0));
 
-        // 📌 Строим график `Chart.js`
         var ctx = document.getElementById("financeChart").getContext("2d");
         var myChart = new Chart(ctx, {
             type: "bar",
             data: {
                 labels: labels,
-                datasets: [{
-                    label: "Анализ расходов и доходов",
-                    data: values,
-                    backgroundColor: [
-                        "rgba(255, 99, 132, 0.7)",
-                        "rgba(54, 162, 235, 0.7)",
-                        "rgba(255, 206, 86, 0.7)",
-                        "rgba(75, 192, 192, 0.7)"
-                    ],
-                    borderColor: [
-                        "rgba(255, 255, 255, 1)", // Белые границы
-                        "rgba(255, 255, 255, 1)",
-                        "rgba(255, 255, 255, 1)",
-                        "rgba(255, 255, 255, 1)"
-                    ],
-                    borderWidth: 1
-                }]
+                datasets: [
+                    {
+                        label: "Доходы",
+                        data: incomeValues,
+                        backgroundColor: "rgba(54, 162, 235, 0.7)",
+                        borderColor: "rgba(255, 255, 255, 1)",
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Расходы",
+                        data: expenseValues,
+                        backgroundColor: "rgba(255, 99, 132, 0.7)",
+                        borderColor: "rgba(255, 255, 255, 1)",
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false // Убираем легенду, если она не нужна
+                        labels: {
+                            color: 'white'
+                        },
+                        display: true
                     },
                     title: {
                         display: true,
                         text: "Анализ расходов и доходов",
-                        color: 'white', // Белый цвет текста заголовка
+                        color: 'white',
                         font: {
-                            size: 16 // Размер шрифта заголовка
+                            size: 16
                         }
                     }
                 },
@@ -253,18 +248,18 @@
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.5)' // Белые линии сетки
+                            color: 'rgba(255, 255, 255, 0.5)'
                         },
                         ticks: {
-                            color: 'white' // Цвет текста оси Y
+                            color: 'white'
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.5)' // Белые линии сетки
+                            color: 'rgba(255, 255, 255, 0.5)'
                         },
                         ticks: {
-                            color: 'white' // Цвет текста оси X
+                            color: 'white'
                         }
                     }
                 }
