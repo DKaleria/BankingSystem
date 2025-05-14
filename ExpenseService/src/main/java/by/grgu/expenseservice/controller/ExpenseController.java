@@ -3,10 +3,10 @@ package by.grgu.expenseservice.controller;
 import by.grgu.expenseservice.database.entity.Expense;
 import by.grgu.expenseservice.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,7 +53,6 @@ public class ExpenseController {
         return "expense";
     }
 
-
     @GetMapping("/monthly")
     public String getMonthlyExpenses(@RequestHeader("username") String username,
                                      @RequestParam(required = false) Integer month,
@@ -76,7 +75,6 @@ public class ExpenseController {
 
         return "expense";
     }
-
 
     @PostMapping("/add-expense")
     public String addExpense(@RequestHeader("username") String username, @ModelAttribute Expense expense, Model model) {
@@ -158,4 +156,19 @@ public class ExpenseController {
         model.addAttribute("username", username);
         return "expense";
     }
+
+    @GetMapping("/{username}/all")
+    @ResponseBody
+    public List<Expense> getAllExpensesForUser(@PathVariable String username) {
+        System.out.println("📌 Запрос всех расходов пользователя: " + username);
+
+        List<Expense> expenses = expenseService.getAllExpenses(username);
+
+        if (expenses.isEmpty()) {
+            System.out.println("⚠️ У пользователя пока нет расходов, передаем пустой список.");
+        }
+
+        return expenses;
+    }
+
 }

@@ -26,38 +26,34 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense createExpense(Expense expense) {
-        // ✅ Получаем дату рождения пользователя из `AccountService`
-        String birthDateUrl = "http://localhost:8082/accounts/" + expense.getUsername() + "/birthdate";
-        ResponseEntity<LocalDate> birthDateResponse = restTemplate.getForEntity(birthDateUrl, LocalDate.class);
+        System.out.println("📌 Запрос на добавление расхода, username: " + expense.getUsername());
 
-        if (birthDateResponse.getStatusCode().isError() || birthDateResponse.getBody() == null) {
-            throw new IllegalArgumentException("❌ Ошибка: Не удалось получить дату рождения!");
-        }
-
-        LocalDate birthDate = birthDateResponse.getBody();
-
-        // ✅ Проверяем, что расход записывается после даты рождения
-        if (expense.getDate().isBefore(birthDate)) {
-            throw new IllegalArgumentException("❌ Ошибка: Расход не может быть записан до рождения!");
-        }
-
-        // ✅ Получаем общий доход пользователя перед сохранением расхода
+        // ✅ Получаем общий доход пользователя
         String totalIncomeUrl = "http://localhost:8082/incomes/" + expense.getUsername() + "/total";
         ResponseEntity<BigDecimal> incomeResponse = restTemplate.getForEntity(totalIncomeUrl, BigDecimal.class);
+        BigDecimal totalIncome = (incomeResponse.getBody() != null) ? incomeResponse.getBody() : BigDecimal.ZERO;
 
-        if (incomeResponse.getStatusCode().isError() || incomeResponse.getBody() == null) {
-            throw new IllegalArgumentException("❌ Ошибка: Не удалось получить общую сумму доходов!");
+        System.out.println("📌 Общий доход пользователя: " + totalIncome);
+
+        // ✅ Получаем общий расход пользователя перед добавлением нового расхода
+        String totalExpenseUrl = "http://localhost:8082/expenses/" + expense.getUsername() + "/total";
+        ResponseEntity<BigDecimal> expenseResponse = restTemplate.getForEntity(totalExpenseUrl, BigDecimal.class);
+        BigDecimal totalExpense = (expenseResponse.getBody() != null) ? expenseResponse.getBody() : BigDecimal.ZERO;
+
+        System.out.println("📌 Общий расход до добавления нового расхода: " + totalExpense);
+
+        // ✅ Проверяем, что расход не приведет к отрицательному балансу
+        BigDecimal projectedBalance = totalIncome.subtract(totalExpense.add(BigDecimal.valueOf(expense.getAmount())));
+
+        if (projectedBalance.compareTo(BigDecimal.ZERO) < 0) {
+            System.err.println("❌ Ошибка: Расход превышает допустимый лимит!");
+            throw new IllegalArgumentException("❌ Ошибка: Ваш расход превышает доступный баланс!");
         }
 
-        BigDecimal totalIncome = incomeResponse.getBody();
-
-        // ✅ Проверяем, что расход не превышает общий доход
-        if (BigDecimal.valueOf(expense.getAmount()).compareTo(totalIncome) > 0) {
-            throw new IllegalArgumentException("❌ Ошибка: Расход не может превышать общий доход!");
-        }
-
+        // ✅ Сохраняем расход, если проверка пройдена
         return expenseRepository.save(expense);
     }
+
 
     @Override
     public List<Expense> getAllExpenses(String username) {

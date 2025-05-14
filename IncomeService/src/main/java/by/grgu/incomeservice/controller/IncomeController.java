@@ -134,4 +134,18 @@ public class IncomeController {
         model.addAttribute("username", username);
         return "income";
     }
+
+    @GetMapping("/{username}/all")
+    @ResponseBody
+    public List<Income> getAllIncomesForUser(@PathVariable String username) {
+        System.out.println("📌 Запрос всех доходов пользователя: " + username);
+
+        List<Income> incomes = incomeService.getAllIncomes(username);
+
+        if (incomes.isEmpty()) {
+            System.out.println("⚠️ У пользователя пока нет доходов, передаем пустой список.");
+        }
+
+        return incomes;
+    }
 }
