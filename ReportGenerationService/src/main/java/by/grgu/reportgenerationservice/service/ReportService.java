@@ -3,6 +3,7 @@ package by.grgu.reportgenerationservice.service;
 import by.grgu.reportgenerationservice.dto.MonthlyReportDTO;
 import net.sf.jasperreports.engine.JRException;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 public interface ReportService {
@@ -13,5 +14,11 @@ public interface ReportService {
     MonthlyReportDTO generateMonthlyReport(String username, int month, int year);
     void saveMonthlyReport(String username, int month, int year);
     void saveTotalReport(String username);
-    void generateTotalExpenseReport(String username) throws JRException;
+    String generateTotalExpenseReport(String username, String format) throws JRException;
+    String generateMonthlyExpenseReport(String username, int month, int year, String format)
+            throws JRException, IOException;
+    String generateMonthlyIncomeReport(String username, int month, int year, String format)
+            throws JRException, IOException;
+    String generateTotalReport(String username, int month, int year, String format)
+            throws JRException, IOException;
 }

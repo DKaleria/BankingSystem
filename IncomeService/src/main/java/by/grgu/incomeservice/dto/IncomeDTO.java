@@ -1,17 +1,17 @@
-package by.grgu.reportgenerationservice.dto;
+package by.grgu.incomeservice.dto;
 
 import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.Builder;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExpenseDTO {
+public class IncomeDTO {
     private String username;
     private BigDecimal amount;
-    private String description;
+    private String source;
 
     public String getUsername() {
         return username;
@@ -29,11 +29,11 @@ public class ExpenseDTO {
         this.amount = amount;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSource() {
+        return source;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSource(String source) {
+        this.source = source;
     }
 }

@@ -137,7 +137,9 @@
     </form>
 
     <h2 style="color: #4cce50;">Баланс: <span th:text="${balance}">—</span></h2>
-    <h2 style="color: #ff522c;">Процент расходов: <span th:text="${expensePercentage}" %>—</span></h2>
+    <h2 style="color: #ff522c;">
+        Процент расходов: <span th:text="${expensePercentage} + ' %'">—</span>
+    </h2>
 
     <div class="container mt-4">
         <h1 class="text-center">Детали доходов и расходов</h1>
