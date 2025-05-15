@@ -114,48 +114,20 @@
 
 <div class="container mt-4">
     <h1 class="welcome-text">Добро пожаловать, <span th:text="${username}"></span>!</h1>
-    <p>Здесь вы можете управлять своими финансами.</p>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Общий баланс</h5>
                     <p class="card-text" th:text="${totalBalance}">Баланс загружается...</p>
-
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Последние операции</h5>
-                    <ul>
-                        <li th:text="${lastTransaction1}">Операция 1</li>
-                        <li th:text="${lastTransaction2}">Операция 2</li>
-                        <li th:text="${lastTransaction3}">Операция 3</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">План на месяц</h5>
-                    <p class="card-text">Установите цели для своих финансов на этот месяц.</p>
-                    <a href="/goals" class="btn btn-custom">Настроить</a> <!-- Обновленная кнопка -->
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-4 text-center">
-            <a href="/accounts/information" class="btn btn-custom">Редактировать аккаунт</a>
         </div>
     </div>
 
-    <div class="mt-4">
-        <h3>Советы по управлению финансами</h3>
-        <p>Следите за своими расходами и планируйте бюджет. Используйте инструменты для отслеживания финансов.</p>
+    <div class="mt-4 text-center">
+        <a href="/accounts/information" class="btn btn-custom">Редактировать аккаунт</a>
     </div>
 </div>
 

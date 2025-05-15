@@ -11,42 +11,82 @@
             color: white;
         }
 
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+            backdrop-filter: blur(10px); /* Эффект размытия фона */
+            border-radius: 10px; /* Закругленные углы панели */
+        }
+
+        .navbar-toggler {
+            border: none; /* Убираем границу */
+        }
+
+        .navbar-toggler-icon {
+            background-color: transparent; /* Прозрачный фон для кнопки */
+        }
+
+        .navbar-toggler-icon::before,
+        .navbar-toggler-icon::after {
+            content: '';
+            display: block;
+            width: 30px; /* Ширина полосок */
+            height: 3px; /* Высота полосок */
+            background-color: #ff4081; /* Цвет полосок (розовый) */
+            margin: 5px 0; /* Отступы между полосками */
+            transition: all 0.3s; /* Плавный переход */
+        }
+
+        .nav-link {
+            color: #6a11cb; /* Цвет текста ссылок */
+            font-weight: bold; /* Жирный шрифт для ссылок */
+            padding: 10px 15px; /* Отступы вокруг ссылок */
+            transition: color 0.3s; /* Плавный переход цвета */
+        }
+
+        .nav-link:hover {
+            color: #2575fc; /* Цвет текста ссылок при наведении */
+        }
+
+        .nav-link.active {
+            color: #ff4081; /* Цвет активной ссылки (розовый) */
+        }
+
         .welcome-text {
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
+            font-size: 2rem; /* Размер шрифта */
+            font-weight: 700; /* Жирный шрифт */
+            text-align: center; /* Центрирование текста */
+            margin-bottom: 20px; /* Отступ снизу */
         }
 
         .card {
-            margin-bottom: 20px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: black;
+            margin-bottom: 20px; /* Отступы между карточками */
+            border-radius: 10px; /* Закругленные углы карточек */
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон для карточек */
+            color: black; /* Черный текст внутри карточек */
         }
 
         .card-title {
-            color: #6a11cb;
+            color: #6a11cb; /* Цвет заголовков карточек */
         }
 
         .btn-custom {
-            background-color: #2575fc;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.3s;
+            background-color: #2575fc; /* Синий фон */
+            border: none; /* Без границы */
+            color: white; /* Белый текст */
+            border-radius: 5px; /* Закругленные углы */
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            font-weight: bold; /* Жирный шрифт */
+            transition: background-color 0.3s, transform 0.3s; /* Плавный переход */
         }
 
         .btn-custom:hover {
-            background-color: #1a5bb8;
-            transform: scale(1.05);
+            background-color: #1a5bb8; /* Цвет фона при наведении */
+            transform: scale(1.05); /* Увеличение кнопки при наведении */
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg">
     <a class="navbar-brand" href="#">Финансовый менеджер</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,22 +95,11 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link" href="http://localhost:8082/accounts/account">Мой аккаунт</a></li>
-            <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8082/incomes/show">Мои доходы</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8082/expenses/show">Мои расходы</a>
-            </li>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8082/analysis">Анализ расходов и доходов</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8082/recommendations">Рекомендации</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="http://localhost:8082/reports/generate">Генерация отчетов</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/incomes/show">Мои доходы</a></li>
+            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/expenses/show">Мои расходы</a></li>
+            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/analysis">Анализ расходов и доходов</a></li>
+            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/recommendations">Рекомендации</a></li>
+            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/reports/generate">Генерация отчетов</a></li>
             <li class="nav-item"><a class="nav-link" href="http://localhost:8082/identity/exit">Выйти</a></li>
         </ul>
     </div>
