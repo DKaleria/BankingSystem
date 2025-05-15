@@ -184,5 +184,27 @@ public class ReportController {
         return "report";
     }
 
+    @PostMapping("/total-report")
+    public String generateTotalReport(@RequestHeader("username") String username,
+                                      @RequestParam Map<String, String> params,
+                                      Model model) {
+        System.out.println("📌 Запрос на генерацию общего финансового отчета, username: " + username);
+
+        String reportFormat = params.get("reportFormat");
+        int month = Integer.parseInt(params.get("month"));
+        int year = Integer.parseInt(params.get("year"));
+
+        try {
+            String outputPath = reportService.generateTotalReport(username, month, year, reportFormat);
+            model.addAttribute("reportMessage", "✅ Общий финансовый отчет успешно создан: " + outputPath);
+        } catch (IOException | JRException e) {
+            System.err.println("❌ Ошибка генерации отчета: " + e.getMessage());
+            model.addAttribute("reportMessage", "❌ Ошибка при создании общего отчета.");
+        }
+
+        return "report";
+    }
+
+
 
 }

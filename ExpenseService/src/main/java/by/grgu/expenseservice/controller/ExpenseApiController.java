@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/expenses")
@@ -36,6 +37,16 @@ public class ExpenseApiController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(expenseDTOs);
+    }
+
+    @GetMapping("/source-breakdown")
+    public ResponseEntity<Map<String, BigDecimal>> getExpenseBreakdown(
+            @RequestHeader("username") String username,
+            @RequestParam int month,
+            @RequestParam int year) {
+
+        Map<String, BigDecimal> breakdown = expenseService.getExpenseBreakdown(username, month, year);
+        return ResponseEntity.ok(breakdown);
     }
 }
 

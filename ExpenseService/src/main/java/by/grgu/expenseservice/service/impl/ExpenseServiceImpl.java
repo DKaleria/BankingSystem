@@ -11,12 +11,14 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseRepository expenseRepository;
-    private final RestTemplate restTemplate; // ✅ Добавляем RestTemplate
+    private final RestTemplate restTemplate;
 
     @Autowired
     public ExpenseServiceImpl(ExpenseRepository expenseRepository, RestTemplate restTemplate) {
@@ -79,5 +81,13 @@ public class ExpenseServiceImpl implements ExpenseService {
         System.out.println("📌 Запрос расходов с " + startDate + " по " + endDate);
 
         return expenseRepository.getExpensesForMonth(username, startDate, endDate);
+    }
+
+    public Map<String, BigDecimal> getExpenseBreakdown(String username, int month, int year) {
+        List<Expense> expenses = expenseRepository.findByUsernameAndMonth(username, month, year);
+
+        return expenses.stream()
+                .collect(Collectors.groupingBy(Expense::getSource,
+                        Collectors.reducing(BigDecimal.ZERO, expense -> BigDecimal.valueOf(expense.getAmount()), BigDecimal::add)));
     }
 }

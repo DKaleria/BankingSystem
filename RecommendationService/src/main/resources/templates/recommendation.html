@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генерация отчетов</title>
+    <title>Рекомендации</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -111,92 +111,60 @@
         </ul>
     </div>
 </nav>
+
 <div class="container mt-4">
-    <h1 class="welcome-text">Генерация отчетов</h1>
+    <h1 class="welcome-text">Персонализированные рекомендации</h1>
 
-    <div class="card">
+    <form action="/recommendations/personal" method="get">
+        <div class="form-row">
+            <div class="col">
+                <label for="month">Месяц</label>
+                <select class="form-control" id="month" name="month">
+                    <option value="1">Январь</option>
+                    <option value="2">Февраль</option>
+                    <option value="3">Март</option>
+                    <option value="4">Апрель</option>
+                    <option value="5">Май</option>
+                    <option value="6">Июнь</option>
+                    <option value="7">Июль</option>
+                    <option value="8">Август</option>
+                    <option value="9">Сентябрь</option>
+                    <option value="10">Октябрь</option>
+                    <option value="11">Ноябрь</option>
+                    <option value="12">Декабрь</option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="year">Год</label>
+                <input type="number" class="form-control" id="year" name="year" value="2025" min="2000" max="2100">
+            </div>
+            <div class="col">
+                <label for="desiredExpenses">Желаемые траты</label>
+                <input type="number" class="form-control" id="desiredExpenses" name="desiredExpenses" value="5000" min="0">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-custom mt-3">Получить рекомендации</button>
+    </form>
+
+    <div class="card mt-4">
         <div class="card-body">
-            <h5 class="card-title">Создание отчета</h5>
-            <form id="reportForm" action="/reports/total-expense-report" method="post">
-                <div class="form-group">
-                    <label for="reportType">Выберите отчет:</label>
-                    <select id="reportType" name="reportType" class="form-control" required>
-                        <option value="total-expense-report">Общие расходы</option>
-                        <option value="monthly-expense">Расходы за месяц</option>
-                        <option value="monthly-income">Доходы за месяц</option>
-                        <option value="total-report">Общий финансовый отчет</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="reportFormat">Формат отчета:</label>
-                    <select id="reportFormat" name="reportFormat" class="form-control" required>
-                        <option value="pdf">PDF</option>
-                        <option value="text">Текст</option>
-                        <option value="png">PNG</option>
-                    </select>
-                </div>
-
-                <div id="monthYearSelection" class="form-group" style="display: none;">
-                    <label for="month">Месяц:</label>
-                    <input type="number" id="month" name="month" min="1" max="12" class="form-control">
-                    <label for="year">Год:</label>
-                    <input type="number" id="year" name="year" min="2000" max="2100" class="form-control">
-                </div>
-
-                <button type="submit" class="btn btn-custom" onclick="return prepareFormData();">Создать отчет</button>
-            </form>
-
-
-            <script>
-                document.getElementById("reportType").addEventListener("change", function () {
-                    let selectedReport = this.value;
-
-                    // Проверяем, что `selectedReport` НЕ пустой!
-                    if (!selectedReport) return;
-
-                    // Меняем `action` формы на нужный эндпоинт
-                    document.getElementById("reportForm").action = "/reports/" + selectedReport;
-
-                    // Показываем `monthYearSelection` для "monthly" и "total-report"
-                    document.getElementById("monthYearSelection").style.display =
-                        selectedReport.includes("monthly") || selectedReport === "total-report" ? "block" : "none";
-
-                    // Всегда оставляем `POST`
-                    document.getElementById("reportForm").method = "post";
-                });
-
-            </script>
-
-            <script>
-                function prepareFormData() {
-                    let reportType = document.getElementById("reportType").value;
-                    let reportFormat = document.getElementById("reportFormat").value;
-                    let month = document.getElementById("month").value;
-                    let year = document.getElementById("year").value;
-
-                    if (!reportType || !reportFormat) {
-                        alert("Выберите тип отчета и формат!");
-                        return false;
-                    }
-
-                    if (reportType.includes("monthly") && (!month || !year)) {
-                        alert("Выберите месяц и год!");
-                        return false;
-                    }
-
-                    return true;
-                }
-            </script>
-
-
+            <h5 class="card-title">Ваши советы на основе анализа трат</h5>
+            <p>На основе ваших прошлых расходов, вот несколько рекомендаций:</p>
+            <ul>
+                <li th:each="rec : ${recommendations}" th:text="${rec}"></li>
+            </ul>
         </div>
     </div>
 
-    <h2>Результаты</h2>
-    <div th:if="${reportMessage}" class="alert alert-info" role="alert">
-        <strong th:text="${reportMessage}"></strong>
+    <h2>История трат</h2>
+    <div class="alert alert-info" role="alert">
+        <strong>💰 Доходы: <span th:text="${totalIncome}"></span> руб.,
+            🛒 Расходы: <span th:text="${totalExpense}"></span> руб.,
+            📊 Доступный бюджет: <span th:text="${remainingBudget}"></span> руб.,
+            📝 Планируемые траты: <span th:text="${desiredExpenses}"></span> руб.</strong>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

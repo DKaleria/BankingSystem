@@ -17,5 +17,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("SELECT e FROM Expense e WHERE e.username = :username AND e.date BETWEEN :startDate AND :endDate")
     List<Expense> getExpensesForMonth(@Param("username") String username, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    List<Expense> findByUsernameAndDateBetween(String username, LocalDate startDate, LocalDate endDate); // ✅ Запрос расходов за период
+    List<Expense> findByUsernameAndDateBetween(String username, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT e FROM Expense e WHERE e.username = :username AND MONTH(e.date) = :month AND YEAR(e.date) = :year")
+    List<Expense> findByUsernameAndMonth(@Param("username") String username, @Param("month") int month, @Param("year") int year);
 }
