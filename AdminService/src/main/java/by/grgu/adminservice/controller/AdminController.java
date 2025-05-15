@@ -39,14 +39,17 @@ public class AdminController {
     public String getAccountData(@PathVariable String username, Model model) {
         AccountDTO account = adminService.getAccountData(username);
         model.addAttribute("account", account);
-        return "admin-user-edit"; // ✅ Название HTML-шаблона исправлено
+        return "admin_user_edit";  // ✅ Название HTML-шаблона исправлено
     }
-
-    // ✅ Обновление данных пользователя
     @PostMapping("/users/update")
     public String updateAccount(@RequestParam String username, @RequestParam Map<String, String> updates) {
+        System.out.println("Обновление пользователя: " + username + ", данные: " + updates);
         adminService.updateAccountStatus(username, updates);
-        return "redirect:/admin/users"; // ✅ Перенаправление обратно к списку пользователей
+        return "redirect:/admin/success"; // Перенаправление на страницу успеха
     }
 
+    @GetMapping("/success")
+    public String successPage() {
+        return "success"; // Название вашего HTML-шаблона
+    }
 }

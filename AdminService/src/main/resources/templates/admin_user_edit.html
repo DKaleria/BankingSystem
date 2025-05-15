@@ -78,48 +78,44 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/accounts/account">Мой аккаунт</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/incomes/show">Мои доходы</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/expenses/show">Мои расходы</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/analysis">Анализ расходов и доходов</a></li>
-            <li class="nav-item"><a class="nav-link" href="/recommendations">Рекомендации</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://localhost:8082/reports/generate">Генерация отчетов</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin/users">Пользователи</a></li> <!-- ✅ Добавлена ссылка на список пользователей -->
             <li class="nav-item"><a class="nav-link" href="/accounts/exit">Выйти</a></li>
         </ul>
     </div>
 </nav>
 
+
 <div class="container mt-5">
     <h1 class="text-center">Редактирование пользователя</h1>
 
     <div class="info-card">
-        <h3>Данные пользователя</h3>
         <input type="hidden" id="username" th:value="${account.username}">
+        <input type="hidden" id="active" value="true"> <!-- Значение по умолчанию -->
 
         <div class="form-group">
             <label>Имя:</label>
             <span id="firstnameDisplay" th:text="${account.firstname}"></span>
             <input type="text" class="form-control edit-field" id="firstname" th:value="${account.firstname}" style="display: none;">
-            <button class="btn btn-primary btn-edit" onclick="toggleEdit('firstname')">Редактировать</button>
+            <button class="btn btn-primary" onclick="toggleEdit('firstname')">Редактировать</button>
         </div>
 
         <div class="form-group">
             <label>Фамилия:</label>
             <span id="lastnameDisplay" th:text="${account.lastname}"></span>
             <input type="text" class="form-control edit-field" id="lastname" th:value="${account.lastname}" style="display: none;">
-            <button class="btn btn-primary btn-edit" onclick="toggleEdit('lastname')">Редактировать</button>
+            <button class="btn btn-primary" onclick="toggleEdit('lastname')">Редактировать</button>
         </div>
 
         <div class="form-group">
             <label>Email:</label>
             <span id="emailDisplay" th:text="${account.email}"></span>
             <input type="email" class="form-control edit-field" id="email" th:value="${account.email}" style="display: none;">
-            <button class="btn btn-primary btn-edit" onclick="toggleEdit('email')">Редактировать</button>
+            <button class="btn btn-primary" onclick="toggleEdit('email')">Редактировать</button>
         </div>
 
         <div class="form-group">
             <label>Роль:</label>
-            <select class="form-control custom-select" id="role">
+            <select class="form-control" id="role">
                 <option value="USER" th:selected="${account.role == 'USER'}">Пользователь</option>
                 <option value="MANAGER" th:selected="${account.role == 'MANAGER'}">Менеджер</option>
                 <option value="ADMIN" th:selected="${account.role == 'ADMIN'}">Администратор</option>
@@ -145,28 +141,36 @@
     }
 
     function setActive(value) {
-        document.getElementById('active').value = value;
+        document.getElementById('active').value = value; // Устанавливаем значение активности
     }
 
     function saveChanges() {
         let username = document.getElementById('username').value;
-        let updatedData = {
-            firstname: document.getElementById('firstname').value,
-            lastname: document.getElementById('lastname').value,
-            email: document.getElementById('email').value,
-            role: document.getElementById('role').value,
-            active: document.getElementById('active').value
-        };
+        let formData = new URLSearchParams();
+        formData.append("username", username);
+        formData.append("firstname", document.getElementById('firstname').value);
+        formData.append("lastname", document.getElementById('lastname').value);
+        formData.append("email", document.getElementById('email').value);
+        formData.append("role", document.getElementById('role').value);
+        formData.append("active", document.getElementById('active').value);
 
-        fetch(`/admin/users/update?username=${username}`, {
+        console.log("Отправляемые данные:", formData.toString());
+
+        fetch("/admin/users/update", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedData)
-        }).then(() => {
-            alert("✅ Данные обновлены!");
-            location.reload();
-        }).catch(error => console.error("❌ Ошибка обновления данных", error));
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка сети");
+                }
+                window.location.href = "/admin/success"; // ✅ Перенаправляем пользователя на страницу успеха
+            })
+            .catch(error => console.error("❌ Ошибка обновления данных", error));
     }
+
+
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

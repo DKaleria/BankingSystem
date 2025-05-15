@@ -1,12 +1,12 @@
 package by.grgu.adminservice.service.impl;
 
 import by.grgu.adminservice.dto.AccountDTO;
-import by.grgu.adminservice.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
+import by.grgu.adminservice.service.AdminService;import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -36,8 +36,21 @@ public class AdminServiceImpl implements AdminService {
 
     public ResponseEntity<Void> updateAccountStatus(String username, Map<String, String> status) {
         String url = API_GATEWAY_URL + "accounts/" + username + "/status";
-        return restTemplate.postForEntity(url, status, Void.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED); // ✅ Устанавливаем `application/x-www-form-urlencoded`
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>(); // ✅ Создаем `MultiValueMap`
+        status.forEach(formData::add); // ✅ Добавляем все параметры
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers); // ✅ Исправлено!
+
+        return restTemplate.postForEntity(url, requestEntity, Void.class);
     }
+
+
+
+
 
     public AccountDTO getAccountData(String username) {
         String url = API_GATEWAY_URL + "accounts/" + username + "/data";

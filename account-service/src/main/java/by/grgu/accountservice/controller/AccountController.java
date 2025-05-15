@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -166,11 +167,14 @@ public class AccountController {
         List<AccDto> accounts = accountService.getAllAccounts();
         return ResponseEntity.ok(accounts);
     }
-    @PostMapping("/{username}/status")
-    public ResponseEntity<Void> updateAccountStatus(@PathVariable String username, @RequestBody Map<String, String> status) {
+    @PostMapping(value = "/{username}/status", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<Void> updateAccountStatus(
+            @PathVariable String username,
+            @RequestParam Map<String, String> status) { // ✅ Меняем `@RequestBody` на `@RequestParam`
         accountService.updateAccountStatus(username, status);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/{username}/data")
     public ResponseEntity<AccDto> getAccountData(@PathVariable String username) {
         AccDto accountData = accountService.getTotalAccountData(username);

@@ -145,15 +145,30 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
 
-        if (status.containsKey("active")) {
-            account.setActive(Boolean.parseBoolean(status.get("active")));
+        System.out.println("Перед сохранением: " + account);
+
+        if (status.containsKey("firstname")) {
+            account.setFirstname(status.get("firstname"));
+        }
+        if (status.containsKey("lastname")) {
+            account.setLastname(status.get("lastname"));
+        }
+        if (status.containsKey("email")) {
+            account.setEmail(status.get("email"));
         }
         if (status.containsKey("role")) {
             account.setRole(mapRole(status.get("role")));
         }
+        if (status.containsKey("active")) {
+            account.setActive(Boolean.parseBoolean(status.get("active")));
+        }
 
+        System.out.println("Перед сохранением: " + account);
         accountRepository.save(account); // ✅ Сохраняем изменения
+
+        System.out.println("После сохранения: " + account);
     }
+
 
     public AccDto getTotalAccountData(String username) {
         Account account = accountRepository.findByUsername(username)
