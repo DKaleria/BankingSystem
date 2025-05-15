@@ -2,6 +2,7 @@ package by.grgu.accountservice.controller;
 
 import by.grgu.accountservice.database.entity.Account;
 import by.grgu.accountservice.database.entity.AccountRequest;
+import by.grgu.accountservice.dto.AccountDTO;
 import by.grgu.accountservice.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Map;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -139,9 +141,23 @@ public class AccountController {
         return totalIncome.subtract(totalExpense);
     }
 
+    @GetMapping("/information")
+    public String showAccountPage(@RequestHeader("username") String username, Model model) {
+        System.out.println("username in showAccInf: " + username);
 
+        AccountDTO account = accountService.getAccountData(username);
+        model.addAttribute("account", account);
+        System.out.println("model  in showAccInf: " + model);
+        return "account_information"; // ✅ Возвращаем HTML-страницу `account_information.html`
+    }
 
-
+    @PostMapping("/updateField")
+    @ResponseBody
+    public ResponseEntity<String> updateAccountField(@RequestHeader("username") String username,
+                                                     @RequestBody Map<String, String> updatedData) {
+        accountService.updateAccountFields(username, updatedData);
+        return ResponseEntity.ok("✅ Данные успешно обновлены!");
+    }
 
 
 }

@@ -4,6 +4,7 @@ import by.grgu.accountservice.database.entity.Account;
 import by.grgu.accountservice.database.entity.AccountRequest;
 import by.grgu.accountservice.database.enumm.Role;
 import by.grgu.accountservice.database.repository.AccountRepository;
+import by.grgu.accountservice.dto.AccountDTO;
 import by.grgu.accountservice.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -97,4 +99,39 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 authorities
         );
     }
+
+    public AccountDTO getAccountData(String username) {
+        // ✅ Проверяем, есть ли аккаунт в БД
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
+
+        return new AccountDTO(account.getUsername(), account.getFirstname(), account.getLastname(), account.getEmail());
+    }
+
+    public void updateAccountFields(String username, Map<String, String> updatedData) {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
+
+        updatedData.forEach((field, value) -> {
+            switch (field) {
+                case "firstname":
+                    account.setFirstname(value);
+                    break;
+                case "lastname":
+                    account.setLastname(value);
+                    break;
+                case "email":
+                    account.setEmail(value);
+                    break;
+                case "username":
+                    account.setUsername(value);
+                    break;
+                default:
+                    throw new IllegalArgumentException("❌ Недопустимое поле: " + field);
+            }
+        });
+
+        accountRepository.save(account); // ✅ Сохраняем все изменения
+    }
+
 }

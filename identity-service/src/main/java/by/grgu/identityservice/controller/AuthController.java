@@ -41,11 +41,6 @@ public class AuthController {
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
 
-    @GetMapping("/main")
-    public String showMainPage() {
-        return "main";
-    }
-
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
         System.out.println("Страница регистрации вызывается");
