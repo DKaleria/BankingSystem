@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель администратора</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #212529;
+            font-family: 'Arial', sans-serif;
+        }
+        .info-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .edit-field {
+            display: none; /* Initially hidden */
+        }
+        .btn-edit {
+            margin-top: 10px;
+        }
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+            backdrop-filter: blur(10px); /* Эффект размытия фона */
+            border-radius: 10px; /* Закругленные углы панели */
+        }
+        .navbar-toggler {
+            border: none; /* Убираем границу */
+        }
+        .navbar-toggler-icon {
+            background-color: transparent; /* Прозрачный фон для кнопки */
+        }
+        .navbar-toggler-icon::before,
+        .navbar-toggler-icon::after {
+            content: '';
+            display: block;
+            width: 30px; /* Ширина полосок */
+            height: 3px; /* Высота полосок */
+            background-color: #ff4081; /* Цвет полосок (розовый) */
+            margin: 5px 0; /* Отступы между полосками */
+            transition: all 0.3s; /* Плавный переход */
+        }
+        .nav-link {
+            color: #6a11cb; /* Цвет текста ссылок */
+            font-weight: bold; /* Жирный шрифт для ссылок */
+            padding: 10px 15px; /* Отступы вокруг ссылок */
+            transition: color 0.3s; /* Плавный переход цвета */
+        }
+        .nav-link:hover {
+            color: #2575fc; /* Цвет текста ссылок при наведении */
+        }
+        .nav-link.active {
+            color: #ff4081; /* Цвет активной ссылки (розовый) */
+        }
+        .btn-success {
+            background-color: #ffb74d; /* Оранжевый цвет для кнопки "Сохранить изменения" */
+            border-color: #ffb74d; /* Цвет границы */
+            color: white; /* Белый текст */
+        }
+
+        .btn-success:hover {
+            background-color: #ffa726; /* Более темный оранжевый при наведении */
+            border-color: #ffa726; /* Цвет границы при наведении */
+        }
+
+        .btn-primary {
+            background-color: #6a11cb; /* Синий цвет для кнопок "Редактировать" */
+            border-color: #6a11cb; /* Цвет границы */
+            color: white; /* Белый текст */
+        }
+
+        .btn-primary:hover {
+            background-color: #2575fc; /* Светло-синий при наведении */
+            border-color: #2575fc; /* Цвет границы при наведении */
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="#">Финансовый менеджер</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/accounts/exit">Выйти</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container mt-5">
+    <h1 class="text-center">Панель администратора</h1>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Имя пользователя</th>
+            <th>Email</th>
+            <th>Роль</th>
+            <th>Активность</th>
+            <th>Действие</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.role}"></td>
+            <td th:text="${user.active ? 'Активен' : 'Неактивен'}"></td>
+            <td><a th:href="@{/admin/users/{username}(username=${user.username})}"
+                   class="btn btn-primary">Редактировать</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</html>

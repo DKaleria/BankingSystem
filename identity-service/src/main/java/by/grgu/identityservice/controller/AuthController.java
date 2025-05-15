@@ -21,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -73,7 +74,67 @@ public class AuthController {
         return ResponseEntity.ok(users);
     }
 
+
+    /*@SneakyThrows
+    @PostMapping("/authenticate")
+    public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
+        System.out.println("Authenticate method called with username: " + username);
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            if (authentication.isAuthenticated()) {
+                String accessToken = jwtTokenUtil.generateAccessToken(authentication);
+                String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
+                System.out.println("Отправка токена в UserService");
+                userService.sendToken(username, accessToken);
+
+                String role = authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .findFirst()
+                        .orElse("USER");
+
+                return "ADMIN".equals(role) ? "redirect:/admin/users" : "redirect:/accounts/account";
+            }
+        } catch (BadCredentialsException e) {
+            redirectAttributes.addFlashAttribute("error", "❌ Неверное имя пользователя или пароль.");
+        }
+
+        return "redirect:/identity/login";
+    }*/
+
     @SneakyThrows
+    @PostMapping("/authenticate")
+    public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            if (authentication.isAuthenticated()) {
+                String accessToken = jwtTokenUtil.generateAccessToken(authentication);
+                userService.sendToken(username, accessToken);
+
+                String role = authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .findFirst()
+                        .orElse("USER");
+
+                // Редирект на полные URL
+                return "ADMIN".equals(role) ? "redirect:http://localhost:8082/admin/users" : "redirect:http://localhost:8082/accounts/account";
+            }
+        } catch (BadCredentialsException e) {
+            redirectAttributes.addFlashAttribute("error", "❌ Неверное имя пользователя или пароль.");
+        }
+
+        return "redirect:http://localhost:8082/identity/login";
+    }
+
+
+
+   /*@SneakyThrows
     @PostMapping("/authenticate")
     public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
         System.out.println("Authenticate method called with username: " + username);
@@ -98,82 +159,6 @@ public class AuthController {
 
         // Перенаправление на страницу логина с ошибкой
         return "redirect:/identity/login";
-    }
-/*
-    @PostMapping("/authenticate")
-    public AuthenticationResponse authenticate(@RequestParam String username, @RequestParam String password) {
-        System.out.println("Authenticate method called with username: " + username);
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        if (authentication.isAuthenticated()) {
-            String accessToken = jwtTokenUtil.generateAccessToken(authentication);
-            String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
-
-            System.out.println("Отправка токена в UserService");
-            userService.sendToken(username, accessToken);
-
-            return new AuthenticationResponse(accessToken, refreshToken);
-        } else {
-            throw new RuntimeException("invalid access");
-        }
-    }
-    */
-
-   /* @SneakyThrows
-    @PostMapping("/authenticate")
-    public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest request) {
-        System.out.println("Authenticate method called with username: " + request.getUsername());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        if (authentication.isAuthenticated()) {
-            String accessToken = jwtTokenUtil.generateAccessToken(authentication);
-            String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
-
-
-            System.out.println("Отправка токена в UserService");
-            userService.sendToken(request.getUsername(), accessToken);
-
-            return new AuthenticationResponse(accessToken, refreshToken);
-        } else {
-            throw new RuntimeException("invalid access");
-        }
-    }*/
-
-
-
-    /*@SneakyThrows
-    @PostMapping("/authenticate")
-    public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        if (authentication.isAuthenticated()) {
-            String accessToken = jwtTokenUtil.generateAccessToken(authentication);
-            String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
-            return new AuthenticationResponse(accessToken, refreshToken);
-        } else {
-            throw new RuntimeException("invalid access");
-        }
-    }*/
-
-
-    /*@SneakyThrows
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        if (authentication.isAuthenticated()) {
-            String jwt = jwtTokenUtil.generateToken(authentication);
-            System.out.println("Generated token: " + jwt);
-            return ResponseEntity.ok(new AuthenticationResponse(jwt));
-        }else {
-            throw new RuntimeException("invalid access");
-        }
     }*/
 
     @GetMapping("/me")

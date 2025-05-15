@@ -4,6 +4,7 @@ import by.grgu.accountservice.database.entity.Account;
 import by.grgu.accountservice.database.entity.AccountRequest;
 import by.grgu.accountservice.database.enumm.Role;
 import by.grgu.accountservice.database.repository.AccountRepository;
+import by.grgu.accountservice.dto.AccDto;
 import by.grgu.accountservice.dto.AccountDTO;
 import by.grgu.accountservice.service.AccountService;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService, UserDetailsService {
@@ -133,5 +135,44 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
         accountRepository.save(account); // ✅ Сохраняем все изменения
     }
+    public List<AccDto> getAllAccounts() {
+        return accountRepository.findAll().stream()
+                .map(this::convertToDto) // ✅ Преобразуем `Account` → `AccDto`
+                .collect(Collectors.toList());
+    }
+
+    public void updateAccountStatus(String username, Map<String, String> status) {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
+
+        if (status.containsKey("active")) {
+            account.setActive(Boolean.parseBoolean(status.get("active")));
+        }
+        if (status.containsKey("role")) {
+            account.setRole(mapRole(status.get("role")));
+        }
+
+        accountRepository.save(account); // ✅ Сохраняем изменения
+    }
+
+    public AccDto getTotalAccountData(String username) {
+        Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
+        return convertToDto(account); // ✅ Преобразуем `Account` → `AccDto`
+    }
+
+    private AccDto convertToDto(Account account) {
+        return new AccDto(
+                account.getUsername(),
+                account.getBirthDate(),
+                account.getFirstname(),
+                account.getLastname(),
+                account.getEmail(),
+                account.getRegistrationDate(),
+                account.isActive(),
+                account.getRole()
+        ); // ✅ Исключаем `id` и `password`
+    }
+
 
 }

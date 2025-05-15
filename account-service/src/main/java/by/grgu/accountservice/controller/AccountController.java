@@ -2,6 +2,7 @@ package by.grgu.accountservice.controller;
 
 import by.grgu.accountservice.database.entity.Account;
 import by.grgu.accountservice.database.entity.AccountRequest;
+import by.grgu.accountservice.dto.AccDto;
 import by.grgu.accountservice.dto.AccountDTO;
 import by.grgu.accountservice.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -159,5 +161,19 @@ public class AccountController {
         return ResponseEntity.ok("✅ Данные успешно обновлены!");
     }
 
-
+    @GetMapping
+    public ResponseEntity<List<AccDto>> getAllAccounts() {
+        List<AccDto> accounts = accountService.getAllAccounts();
+        return ResponseEntity.ok(accounts);
+    }
+    @PostMapping("/{username}/status")
+    public ResponseEntity<Void> updateAccountStatus(@PathVariable String username, @RequestBody Map<String, String> status) {
+        accountService.updateAccountStatus(username, status);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/{username}/data")
+    public ResponseEntity<AccDto> getAccountData(@PathVariable String username) {
+        AccDto accountData = accountService.getTotalAccountData(username);
+        return ResponseEntity.ok(accountData);
+    }
 }
