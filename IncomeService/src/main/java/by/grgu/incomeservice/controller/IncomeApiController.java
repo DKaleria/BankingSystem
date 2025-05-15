@@ -21,15 +21,14 @@ public class IncomeApiController {
     public ResponseEntity<List<IncomeDTO>> getMonthlyIncomesApi(@RequestHeader("username") String username,
                                                                 @RequestParam int month,
                                                                 @RequestParam int year) {
-        System.out.println("📌 API-запрос на JSON-доходы за месяц, username: " + username);
 
         List<Income> incomes = incomeService.getIncomesForMonth(username, month, year);
 
-        // ✅ Преобразуем `Income` в `IncomeDTO`
+
         List<IncomeDTO> incomeDTOs = incomes.stream()
                 .map(income -> new IncomeDTO(income.getUsername(),
                         BigDecimal.valueOf(income.getAmount()),
-                        income.getSource()))  // ✅ Добавляем источник дохода!
+                        income.getSource()))
                 .toList();
 
         return ResponseEntity.ok()

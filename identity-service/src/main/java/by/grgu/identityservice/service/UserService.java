@@ -56,27 +56,25 @@ public class UserService implements UserDetailsService {
         System.out.println("Registration Request: " + request);
 
         if (request.getPassword() == null) {
-            throw new IllegalArgumentException("❌ Пароль не может быть пустым!");
+            throw new IllegalArgumentException("Пароль не может быть пустым!");
         }
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("❌ Пользователь уже существует!");
+            throw new IllegalArgumentException("Пользователь уже существует!");
         }
 
-        // ✅ Проверяем роль, если не указана — устанавливаем `USER`
         Role assignedRole = Role.USER;
         if (request.getRole() != null) {
             try {
                 assignedRole = Role.valueOf(request.getRole().toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new RuntimeException("❌ Недопустимая роль: " + request.getRole());
+                throw new RuntimeException("Недопустимая роль: " + request.getRole());
             }
         }
 
         User user = authUserMapper.toUser(request, passwordEncoder);
-        user.setRole(assignedRole); // ✅ Сохраняем выбранную роль
+        user.setRole(assignedRole);
 
-        System.out.println("User after mapping: " + user);
         createAccountForUser(user);
 
         return userRepository.save(user);
@@ -99,7 +97,7 @@ public class UserService implements UserDetailsService {
                 .role(user.getRole())
                 .password(user.getPassword())
                 .build();
-        System.out.println("createAccountForUser: " + accountRequest);
+
         ResponseEntity<Void> response = restTemplate.exchange(
                 ACCOUNT_SERVICE_URL,
                 HttpMethod.POST,
@@ -115,47 +113,6 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Failed to create account for user: " + accountRequest.getUsername());
         }
     }
-    /*private void createAccountForUser(User user) {
-        // ✅ Создаем единый `AccountRequest`
-        AccountRequest accountRequest = AccountRequest.builder()
-                .username(user.getUsername())
-                .birthDate(user.getBirthDate())
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .email(user.getEmail())
-                .registrationDate(LocalDate.now())
-                .active(true)
-                .role(user.getRole())
-                .password(user.getPassword())
-                .build();
-
-        System.out.println("createAccount: " + accountRequest);
-
-        // ✅ Выбираем правильный URL в зависимости от роли
-        String targetUrl = switch (user.getRole()) {
-            case USER -> ACCOUNT_SERVICE_URL;
-            case MANAGER -> MANAGER_SERVICE_URL;
-            case ADMIN -> ADMIN_SERVICE_URL;
-            default -> throw new IllegalArgumentException("❌ Недопустимая роль: " + user.getRole());
-        };
-
-        // ✅ Отправляем запрос в нужный сервис
-        ResponseEntity<Void> response = restTemplate.exchange(
-                targetUrl,
-                HttpMethod.POST,
-                new HttpEntity<>(accountRequest, new HttpHeaders()),
-                Void.class
-        );
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("✅ Аккаунт успешно создан для: " + accountRequest.getUsername());
-        } else if (response.getStatusCode().value() == 409) {
-            throw new IllegalArgumentException("❌ Аккаунт уже существует: " + accountRequest.toString());
-        } else {
-            throw new RuntimeException("❌ Ошибка при создании аккаунта: " + accountRequest.getUsername());
-        }
-    }*/
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

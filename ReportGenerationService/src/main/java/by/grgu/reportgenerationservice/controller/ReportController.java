@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -25,24 +24,17 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-
-
     @GetMapping("/generate")
     public String showReportPage(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Загрузка страницы отчетов, username: " + username);
-
         BigDecimal totalExpense = reportService.getTotalExpenseForUser(username);
         BigDecimal totalIncome = reportService.getTotalIncomeForUser(username);
-
-        System.out.println("📊 Общие расходы: " + totalExpense);
-        System.out.println("📊 Общие доходы: " + totalIncome);
 
         model.addAttribute("username", username);
         model.addAttribute("totalExpense", totalExpense);
         model.addAttribute("totalIncome", totalIncome);
 
         System.out.println("Model: "+ model);
-        return "report"; // ✅ Отображаем страницу report.html
+        return "report";
     }
 
     @GetMapping("/total-monthly-expense")
@@ -121,16 +113,14 @@ public class ReportController {
     public String generateTotalExpenseReport(@RequestHeader("username") String username,
                                              @RequestParam Map<String, String> params,
                                              Model model) {
-        System.out.println("📌 Запрос на генерацию отчета, username: " + username);
-
         String reportFormat = params.get("reportFormat");
 
         try {
             String outputPath = reportService.generateTotalExpenseReport(username, reportFormat);
             model.addAttribute("reportMessage", "✅ Отчет успешно создан: " + outputPath);
         } catch (JRException e) {
-            System.err.println("❌ Ошибка генерации отчета: " + e.getMessage());
-            model.addAttribute("reportMessage", "❌ Ошибка при создании отчета.");
+            System.err.println("Ошибка генерации отчета: " + e.getMessage());
+            model.addAttribute("reportMessage", "Ошибка при создании отчета.");
         }
 
         return "report";
@@ -141,8 +131,6 @@ public class ReportController {
     public String generateMonthlyExpenseReport(@RequestHeader("username") String username,
                                                @RequestParam Map<String, String> params,
                                                Model model) {
-        System.out.println("📌 Запрос на генерацию отчета по расходам за месяц, username: " + username);
-
         String reportFormat = params.get("reportFormat");
         int month = Integer.parseInt(params.get("month"));
         int year = Integer.parseInt(params.get("year"));
@@ -167,8 +155,6 @@ public class ReportController {
     public String generateMonthlyIncomeReport(@RequestHeader("username") String username,
                                               @RequestParam Map<String, String> params,
                                               Model model) {
-        System.out.println("📌 Запрос на генерацию отчета по доходам за месяц, username: " + username);
-
         String reportFormat = params.get("reportFormat");
         int month = Integer.parseInt(params.get("month"));
         int year = Integer.parseInt(params.get("year"));
@@ -177,7 +163,7 @@ public class ReportController {
             String outputPath = reportService.generateMonthlyIncomeReport(username, month, year, reportFormat);
             model.addAttribute("reportMessage", "✅ Отчет по доходам за месяц успешно создан: " + outputPath);
         } catch (IOException | JRException e) {
-            System.err.println("❌ Ошибка генерации отчета: " + e.getMessage());
+            System.err.println("Ошибка генерации отчета: " + e.getMessage());
             model.addAttribute("reportMessage", "❌ Ошибка при создании отчета.");
         }
 
@@ -188,8 +174,6 @@ public class ReportController {
     public String generateTotalReport(@RequestHeader("username") String username,
                                       @RequestParam Map<String, String> params,
                                       Model model) {
-        System.out.println("📌 Запрос на генерацию общего финансового отчета, username: " + username);
-
         String reportFormat = params.get("reportFormat");
         int month = Integer.parseInt(params.get("month"));
         int year = Integer.parseInt(params.get("year"));
@@ -198,13 +182,10 @@ public class ReportController {
             String outputPath = reportService.generateTotalReport(username, month, year, reportFormat);
             model.addAttribute("reportMessage", "✅ Общий финансовый отчет успешно создан: " + outputPath);
         } catch (IOException | JRException e) {
-            System.err.println("❌ Ошибка генерации отчета: " + e.getMessage());
+            System.err.println("Ошибка генерации отчета: " + e.getMessage());
             model.addAttribute("reportMessage", "❌ Ошибка при создании общего отчета.");
         }
 
         return "report";
     }
-
-
-
 }

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
@@ -43,8 +42,6 @@ public class AccountController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("username", request.getUsername());
 
-        System.out.println("📌 Аккаунт создан, передаем username: " + request.getUsername());
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(headers)
                 .build();
@@ -52,16 +49,14 @@ public class AccountController {
 
     @GetMapping("/{username}/birthdate")
     public ResponseEntity<LocalDate> getBirthDate(@PathVariable String username) {
-        System.out.println("📌 Запрос на дату рождения аккаунта: " + username);
 
         Account account = accountService.getAccount(username).getBody();
 
         if (account == null) {
-            System.err.println("❌ Ошибка: аккаунт не найден!");
-            return ResponseEntity.notFound().build(); // ✅ Если аккаунта нет, возвращаем 404
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(account.getBirthDate()); // ✅ Возвращаем только `birthDate`
+        return ResponseEntity.ok(account.getBirthDate());
     }
 
     @GetMapping("/{username}")
@@ -76,14 +71,11 @@ public class AccountController {
 
     @GetMapping("/account")
     public String showAccount(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Запрос в /account, username: " + username);
 
         if (username == null || username.isEmpty()) {
-            System.err.println("❌ Ошибка: `username` не передан!");
             return "redirect:http://localhost:8082/identity/login";
         }
 
-        // ✅ Загружаем баланс пользователя
         String balanceUrl = "http://localhost:8082/accounts/" + username + "/balance";
         ResponseEntity<BigDecimal> response = restTemplate.getForEntity(balanceUrl, BigDecimal.class);
         BigDecimal totalBalance = response.getBody() != null ? response.getBody() : BigDecimal.ZERO;
@@ -91,9 +83,8 @@ public class AccountController {
         model.addAttribute("username", username);
         model.addAttribute("totalBalance", totalBalance);
 
-        return "account"; // ✅ Загружаем страницу аккаунта с данными
+        return "account";
     }
-
 
     @GetMapping("/exit")
     public String showExitPage() {
@@ -115,7 +106,6 @@ public class AccountController {
     @GetMapping("/{username}/balance")
     @ResponseBody
     public BigDecimal getTotalBalance(@PathVariable String username) {
-        System.out.println("📌 Запрос баланса пользователя: " + username);
 
         BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal totalExpense = BigDecimal.ZERO;
@@ -125,7 +115,7 @@ public class AccountController {
             ResponseEntity<BigDecimal> incomeResponse = restTemplate.getForEntity(incomeUrl, BigDecimal.class);
             totalIncome = (incomeResponse.getBody() != null) ? incomeResponse.getBody() : BigDecimal.ZERO;
         } catch (Exception e) {
-            System.err.println("⚠️ Ошибка при получении доходов: " + e.getMessage());
+            System.err.println("Ошибка при получении доходов: " + e.getMessage());
         }
 
         try {
@@ -133,11 +123,10 @@ public class AccountController {
             ResponseEntity<BigDecimal> expenseResponse = restTemplate.getForEntity(expenseUrl, BigDecimal.class);
             totalExpense = (expenseResponse.getBody() != null) ? expenseResponse.getBody() : BigDecimal.ZERO;
         } catch (Exception e) {
-            System.err.println("⚠️ Ошибка при получении расходов: " + e.getMessage());
+            System.err.println("Ошибка при получении расходов: " + e.getMessage());
         }
 
         if (totalExpense.compareTo(BigDecimal.ZERO) == 0) {
-            System.out.println("🔹 Нет расходов, баланс равен доходам.");
             return totalIncome;
         }
 
@@ -146,12 +135,10 @@ public class AccountController {
 
     @GetMapping("/information")
     public String showAccountPage(@RequestHeader("username") String username, Model model) {
-        System.out.println("username in showAccInf: " + username);
-
         AccountDTO account = accountService.getAccountData(username);
         model.addAttribute("account", account);
-        System.out.println("model  in showAccInf: " + model);
-        return "account_information"; // ✅ Возвращаем HTML-страницу `account_information.html`
+
+        return "account_information";
     }
 
     @PostMapping("/updateField")
@@ -159,7 +146,7 @@ public class AccountController {
     public ResponseEntity<String> updateAccountField(@RequestHeader("username") String username,
                                                      @RequestBody Map<String, String> updatedData) {
         accountService.updateAccountFields(username, updatedData);
-        return ResponseEntity.ok("✅ Данные успешно обновлены!");
+        return ResponseEntity.ok("Данные успешно обновлены!");
     }
 
     @GetMapping
@@ -170,7 +157,7 @@ public class AccountController {
     @PostMapping(value = "/{username}/status", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<Void> updateAccountStatus(
             @PathVariable String username,
-            @RequestParam Map<String, String> status) { // ✅ Меняем `@RequestBody` на `@RequestParam`
+            @RequestParam Map<String, String> status) {
         accountService.updateAccountStatus(username, status);
         return ResponseEntity.ok().build();
     }

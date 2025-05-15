@@ -4,7 +4,6 @@ import by.grgu.analysisservice.service.AnalysisService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +30,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
             return totalIncome.subtract(totalExpense);
         } catch (Exception e) {
-            System.err.println("⚠️ Ошибка в `getTotalBalance`: " + e.getMessage());
+            System.err.println("Ошибка в `getTotalBalance`: " + e.getMessage());
             return BigDecimal.ZERO;
         }
     }
@@ -39,8 +38,6 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     @Override
     public BigDecimal getExpensePercentage(String username, int month, int year) {
-        System.out.println("📌 Запрос процента расходов, username: " + username);
-
         BigDecimal totalIncome = getTotalIncome(username, month, year);
         BigDecimal totalExpense = getTotalExpense(username, month, year);
 
@@ -80,7 +77,7 @@ public class AnalysisServiceImpl implements AnalysisService {
             ResponseEntity<BigDecimal> response = restTemplate.getForEntity(url, BigDecimal.class);
             return response.getBody() != null ? response.getBody() : BigDecimal.ZERO;
         } catch (Exception e) {
-            System.err.println("⚠️ Ошибка при запросе: " + e.getMessage());
+            System.err.println("Ошибка при запросе: " + e.getMessage());
             return BigDecimal.ZERO;
         }
     }

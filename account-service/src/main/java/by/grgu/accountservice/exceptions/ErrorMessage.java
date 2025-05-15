@@ -2,7 +2,6 @@ package by.grgu.accountservice.exceptions;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.Date;
 
 @Getter

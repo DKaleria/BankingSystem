@@ -5,7 +5,6 @@ import by.grgu.accountservice.database.entity.AccountRequest;
 import by.grgu.accountservice.dto.AccDto;
 import by.grgu.accountservice.dto.AccountDTO;
 import org.springframework.http.ResponseEntity;
-
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public interface AccountService {
 
     void updateAccountFields(String username, Map<String, String> updatedData);
 
-    List<AccDto> getAllAccounts(); // ✅ Исправляем ожидаемый тип возврата
+    List<AccDto> getAllAccounts();
 
     void updateAccountStatus(String username, Map<String, String> status);
 

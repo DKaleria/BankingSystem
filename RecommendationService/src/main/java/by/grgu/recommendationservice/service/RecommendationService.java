@@ -1,7 +1,6 @@
 package by.grgu.recommendationservice.service;
 
 import by.grgu.recommendationservice.database.entity.RecommendationReport;
-
 import java.math.BigDecimal;
 
 public interface RecommendationService {

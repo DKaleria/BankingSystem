@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +31,14 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     public ResponseEntity<Void> createAccount(AccountRequest request) {
-        System.out.println("Аккаунт реквест: " + request);
         if (accountExists(request.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 Conflict
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         Account account = mapToAccount(request);
         accountRepository.save(account);
-        System.out.println("Аккаунт готов: " + account);
-        return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     public ResponseEntity<Account> getAccount(String username) {
@@ -51,11 +49,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     public ResponseEntity<Void> deleteAccount(String username) {
         if (!accountExists(username)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         accountRepository.deleteByUsername(username);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
     private boolean accountExists(String username) {
@@ -70,9 +68,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         account.setLastname(request.getLastname());
         account.setPassword(request.getPassword());
         account.setEmail(request.getEmail());
-        account.setRegistrationDate(LocalDate.now()); // Установите текущую дату
+        account.setRegistrationDate(LocalDate.now());
         account.setActive(request.isActive());
-        account.setRole(mapRole(request.getRole())); // Логика маппинга роли
+        account.setRole(mapRole(request.getRole()));
         return account;
     }
 
@@ -94,7 +92,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 account.getUsername(),
                 account.getPassword(),
-                account.isActive(), // Активен ли аккаунт
+                account.isActive(),
                 true, // accountNonExpired - не истек ли срок действия учетной записи (если false, то истек)
                 true, // credentialsNonExpired - не истекли ли учетные данные (пароль) (если false, то истек)
                 true, // accountNonLocked - не заблокирована ли учетная запись  (если false, то заблокирована)
@@ -103,16 +101,15 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     public AccountDTO getAccountData(String username) {
-        // ✅ Проверяем, есть ли аккаунт в БД
         Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
+                .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + username));
 
         return new AccountDTO(account.getUsername(), account.getFirstname(), account.getLastname(), account.getEmail());
     }
 
     public void updateAccountFields(String username, Map<String, String> updatedData) {
         Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
+                .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + username));
 
         updatedData.forEach((field, value) -> {
             switch (field) {
@@ -129,23 +126,21 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                     account.setUsername(value);
                     break;
                 default:
-                    throw new IllegalArgumentException("❌ Недопустимое поле: " + field);
+                    throw new IllegalArgumentException("Недопустимое поле: " + field);
             }
         });
 
-        accountRepository.save(account); // ✅ Сохраняем все изменения
+        accountRepository.save(account);
     }
     public List<AccDto> getAllAccounts() {
         return accountRepository.findAll().stream()
-                .map(this::convertToDto) // ✅ Преобразуем `Account` → `AccDto`
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     public void updateAccountStatus(String username, Map<String, String> status) {
         Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
-
-        System.out.println("Перед сохранением: " + account);
+                .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + username));
 
         if (status.containsKey("firstname")) {
             account.setFirstname(status.get("firstname"));
@@ -163,17 +158,13 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             account.setActive(Boolean.parseBoolean(status.get("active")));
         }
 
-        System.out.println("Перед сохранением: " + account);
-        accountRepository.save(account); // ✅ Сохраняем изменения
-
-        System.out.println("После сохранения: " + account);
+        accountRepository.save(account);
     }
-
 
     public AccDto getTotalAccountData(String username) {
         Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + username));
-        return convertToDto(account); // ✅ Преобразуем `Account` → `AccDto`
+                .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + username));
+        return convertToDto(account);
     }
 
     private AccDto convertToDto(Account account) {
@@ -186,8 +177,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 account.getRegistrationDate(),
                 account.isActive(),
                 account.getRole()
-        ); // ✅ Исключаем `id` и `password`
+        );
     }
-
-
 }

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +35,7 @@ public class IncomeServiceImpl implements IncomeService {
         LocalDate birthDate = response.getBody();
 
         if (income.getDate().isBefore(birthDate)) {
-            throw new IllegalArgumentException("❌ Ошибка: доход не может быть записан до рождения!");
+            throw new IllegalArgumentException("Ошибка: доход не может быть записан до рождения!");
         }
 
         return incomeRepository.save(income);
@@ -64,21 +63,15 @@ public class IncomeServiceImpl implements IncomeService {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
-        System.out.println("📌 Запрос доходов с " + startDate + " по " + endDate);
-
         return incomeRepository.getIncomesForMonth(username, startDate, endDate);
     }
 
     @Override
     public BigDecimal getTotalIncomeForUser(String username) {
-        System.out.println("📌 Запрос общей суммы доходов пользователя: " + username);
-
         List<Income> incomes = incomeRepository.findByUsername(username);
 
         return incomes.stream()
                 .map(income -> BigDecimal.valueOf(income.getAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
-
 }

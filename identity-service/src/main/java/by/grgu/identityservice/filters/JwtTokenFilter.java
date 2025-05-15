@@ -51,44 +51,4 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
-
-
-//    private final JwtTokenUtil jwtTokenUtil;
-//    private final UserService userService;
-//
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-//            throws ServletException, IOException {
-//        String authorization = request.getHeader("Authorization");
-//        if (request.getServletPath().matches("/identity/register|/identity/authenticate|/identity/validate-token")) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (authorization != null && authorization.startsWith("Bearer ")) {
-//            String token = authorization.substring(7);
-//            if (jwtTokenUtil.validateToken(token)) {
-//                String username = jwtTokenUtil.getUsernameFromToken(token);
-//                String role = (String) jwtTokenUtil.getRolesFromToken(token);
-//                System.out.println("Username: " + username);
-//                System.out.println("Role: " + role);
-//                Optional<UserDetails> userDetails = Optional.ofNullable(userService.loadUserByUsername(username));
-//
-//                if (userDetails.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {
-//                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-//                            userDetails.get(), null, userDetails.get().getAuthorities());
-//                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                    SecurityContextHolder.getContext().setAuthentication(authentication);
-//                }
-//            } else {
-//                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//                return;
-//            }
-//        } else {
-//            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//            return;
-//        }
-//        filterChain.doFilter(request, response);
-//    }
 }

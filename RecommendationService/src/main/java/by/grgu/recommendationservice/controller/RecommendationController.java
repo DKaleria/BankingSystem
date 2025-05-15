@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class RecommendationController {
         model.addAttribute("remainingBudget", "—");
         model.addAttribute("desiredExpenses", "—");
         model.addAttribute("recommendations", List.of());
-        return "recommendation"; // Вернем шаблон Thymeleaf `recommendation.html`
+        return "recommendation";
     }
 
     @GetMapping("/personal")
@@ -47,6 +46,6 @@ public class RecommendationController {
         model.addAttribute("desiredExpenses", report.getDesiredExpenses());
         model.addAttribute("recommendations", report.getRecommendations());
 
-        return "recommendation"; // Вернем шаблон Thymeleaf `recommendation.html`
+        return "recommendation";
     }
 }

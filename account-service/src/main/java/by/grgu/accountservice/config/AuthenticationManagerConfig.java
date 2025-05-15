@@ -19,7 +19,6 @@ public class AuthenticationManagerConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
         return authConfiguration.getAuthenticationManager();

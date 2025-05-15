@@ -165,9 +165,9 @@
                 if (!response.ok) {
                     throw new Error("Ошибка сети");
                 }
-                window.location.href = "/admin/success"; // ✅ Перенаправляем пользователя на страницу успеха
+                window.location.href = "/admin/success";
             })
-            .catch(error => console.error("❌ Ошибка обновления данных", error));
+            .catch(error => console.error("Ошибка обновления данных", error));
     }
 
 

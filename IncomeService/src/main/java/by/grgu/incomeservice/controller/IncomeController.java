@@ -28,8 +28,6 @@ public class IncomeController {
                              @RequestParam(value = "month", required = false) Integer month,
                              @RequestParam(value = "year", required = false) Integer year,
                              Model model) {
-        System.out.println("📌 Запрос в /incomes от API Gateway, username: " + username);
-
         model.addAttribute("username", username);
         model.addAttribute("incomeType", incomeType);
         model.addAttribute("month", month);
@@ -53,7 +51,6 @@ public class IncomeController {
                                     @RequestParam int month,
                                     @RequestParam int year,
                                     Model model) {
-        System.out.println("📌 Запрос на доходы за месяц, username: " + username);
 
         List<Income> incomes = incomeService.getIncomesForMonth(username, month, year);
 
@@ -67,31 +64,27 @@ public class IncomeController {
 
     @PostMapping("/add-income")
     public String addIncome(@RequestHeader("username") String username, @ModelAttribute Income income, Model model) {
-        System.out.println("📌 Запрос на добавление дохода, username: " + username);
 
         income.setUsername(username);
 
         try {
             incomeService.createIncome(income);
         } catch (IllegalArgumentException e) {
-            System.out.println("❌ Ошибка: " + e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage()); // ✅ Передаем ошибку в Thymeleaf
-            return getUserIncomes(username, model); // ✅ Возвращаем страницу доходов с предупреждением
+            System.out.println("Ошибка: " + e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            return getUserIncomes(username, model);
         }
 
-        return getUserIncomes(username, model); // ✅ Перенаправляем на страницу доходов
+        return getUserIncomes(username, model);
     }
 
 
 
     @GetMapping("/user-incomes")
     public String getUserIncomes(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Запрос в /user-incomes от API Gateway, username: " + username);
-
         List<Income> incomes = incomeService.getAllIncomes(username);
 
         if (incomes == null || incomes.isEmpty()) {
-            System.out.println("⚠️ У пользователя пока нет доходов, передаем пустой список.");
             incomes = new ArrayList<>();
         }
         System.out.println("username: "+ username);
@@ -109,14 +102,12 @@ public class IncomeController {
     public BigDecimal getTotalIncome(@RequestHeader("username") String username,
                                      @RequestParam int month,
                                      @RequestParam int year) {
-        System.out.println("📌 Запрос на total от API Gateway, username: " + username);
         return incomeService.getTotalIncomeForMonth(username, month, year);
     }
 
     @GetMapping("/{username}/total")
     @ResponseBody
     public BigDecimal getTotalIncomeForUser(@PathVariable String username) {
-        System.out.println("📌 Запрос общей суммы доходов пользователя: " + username);
         return incomeService.getTotalIncomeForUser(username);
     }
 
@@ -124,13 +115,11 @@ public class IncomeController {
     @GetMapping("/all")
     @ResponseBody
     public List<Income> getAllIncomes(@RequestHeader("username") String username) {
-        System.out.println("📌 Запрос на all от API Gateway, username: " + username);
         return incomeService.getAllIncomes(username);
     }
 
     @GetMapping("/show")
     public String showIncome(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Запрос в /show от API Gateway, username: " + username);
         model.addAttribute("username", username);
         return "income";
     }
@@ -138,12 +127,10 @@ public class IncomeController {
     @GetMapping("/{username}/all")
     @ResponseBody
     public List<Income> getAllIncomesForUser(@PathVariable String username) {
-        System.out.println("📌 Запрос всех доходов пользователя: " + username);
-
         List<Income> incomes = incomeService.getAllIncomes(username);
 
         if (incomes.isEmpty()) {
-            System.out.println("⚠️ У пользователя пока нет доходов, передаем пустой список.");
+            System.out.println("У пользователя пока нет доходов, передаем пустой список.");
         }
 
         return incomes;

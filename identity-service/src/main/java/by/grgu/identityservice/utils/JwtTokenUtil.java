@@ -2,13 +2,10 @@ package by.grgu.identityservice.utils;
 
 import by.grgu.identityservice.config.JwtConfig;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import javax.xml.bind.DatatypeConverter;
@@ -40,18 +37,6 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-   /* public boolean validateToken(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
-                    .parseClaimsJws(token).getBody();
-
-            // Проверяем, не истек ли срок действия токена
-            return !claims.getExpiration().before(new Date());
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }*/
 
     public boolean validateToken(String token) {
         try {
@@ -83,27 +68,5 @@ public class JwtTokenUtil {
         }
     }
 
-    /*public Object getRolesFromToken(String token) {
-        try {
-            Object rolesObj = Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(secret))
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get("roles");
 
-            if (rolesObj instanceof List<?>) {
-                List<String> roles = new ArrayList<>();
-                for (Object role : (List<?>) rolesObj) {
-                    if (role instanceof String) {
-                        roles.add((String) role);
-                    }
-                }
-                return roles;
-            } else {
-                return new ErrorMessage(new Date(), "Роли не найдены");
-            }
-        } catch (JwtException e) {
-            return new ErrorMessage(new Date(), "Ошибка валидации токена: " + e.getMessage());
-        }
-    }*/
 }

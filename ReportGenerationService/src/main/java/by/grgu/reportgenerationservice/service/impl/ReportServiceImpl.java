@@ -102,7 +102,7 @@ public class ReportServiceImpl implements ReportService {
                 API_GATEWAY_URL, username, month, year);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE); // ✅ Запрашиваем JSON!
+        headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
@@ -110,20 +110,16 @@ public class ReportServiceImpl implements ReportService {
                 url,
                 HttpMethod.GET,
                 entity,
-                new ParameterizedTypeReference<List<IncomeDTO>>() {}  // ✅ Указываем тип!
+                new ParameterizedTypeReference<List<IncomeDTO>>() {}
         );
 
         List<IncomeDTO> incomes = responseEntity.getBody();
 
-        // ✅ Проверяем, что `source` не `null`
         for (IncomeDTO income : incomes) {
             if (income.getSource() == null) {
-                System.out.println("❌ Ошибка: source=null! Исправляем...");
                 income.setSource("Не указан");
             }
         }
-
-        System.out.println("📌 Исправленные доходы: " + incomes);
 
         return incomes;
     }
@@ -147,15 +143,11 @@ public class ReportServiceImpl implements ReportService {
 
         List<ExpenseDTO> expenses = responseEntity.getBody();
 
-        // ✅ Проверяем, что `description` не `null`
         for (ExpenseDTO expense : expenses) {
             if (expense.getDescription() == null) {
-                System.out.println("❌ Ошибка: description=null! Исправляем...");
                 expense.setDescription("Нет описания");
             }
         }
-
-        System.out.println("📌 Исправленные расходы: " + expenses);
 
         return expenses;
     }
@@ -178,8 +170,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public String generateTotalExpenseReport(String username, String format) throws JRException {
-        System.out.println("📌 Генерация отчета для пользователя: " + username + ", формат: " + format);
-
         JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/total_expense_report.jrxml");
 
         Map<String, Object> parameters = new HashMap<>();
@@ -236,10 +226,8 @@ public class ReportServiceImpl implements ReportService {
                 exporter.exportReport();
                 break;
             default:
-                throw new IllegalArgumentException("❌ Неподдерживаемый формат отчета: " + format);
+                throw new IllegalArgumentException("Неподдерживаемый формат отчета: " + format);
         }
-
-        System.out.println("✅ Отчет успешно создан: " + outputPath);
         return outputPath;
     }
 
@@ -260,8 +248,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public String generateMonthlyExpenseReport(String username, int month, int year, String format) throws JRException, IOException {
-        System.out.println("📌 Генерация отчета расходов за месяц для пользователя: " + username + ", месяц: " + month + ", год: " + year + ", формат: " + format);
-
         JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/monthly_expense_report.jrxml");
 
         Map<String, Object> parameters = new HashMap<>();
@@ -274,11 +260,10 @@ public class ReportServiceImpl implements ReportService {
 
         List<ExpenseDTO> expenses = getExpensesForMonth(username, month, year);
 
-        // ✅ Проверяем, что `description` действительно есть
         for (ExpenseDTO expense : expenses) {
             if (expense.getDescription() == null) {
-                System.out.println("❌ Ошибка: В списке расходов есть объект без `description`!");
-                expense.setDescription("Нет описания"); // ✅ Добавляем значение по умолчанию!
+                System.out.println("Ошибка: В списке расходов есть объект без `description`!");
+                expense.setDescription("Нет описания");
             }
         }
 
@@ -291,8 +276,6 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public String generateMonthlyIncomeReport(String username, int month, int year, String format)
             throws JRException, IOException {
-        System.out.println("📌 Генерация отчета доходов за месяц для пользователя: " + username + ", месяц: " + month + ", год: " + year + ", формат: " + format);
-
         JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/monthly_income_report.jrxml");
 
         Map<String, Object> parameters = new HashMap<>();
@@ -307,7 +290,6 @@ public class ReportServiceImpl implements ReportService {
 
         for (IncomeDTO income : incomes) {
             if (income.getSource() == null) {
-                System.out.println("❌ Ошибка: source=null! Исправляем...");
                 income.setSource("Не указан");
             }
         }
@@ -321,8 +303,6 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public String generateTotalReport(String username, int month, int year, String format)
             throws JRException, IOException {
-        System.out.println("📌 Генерация общего финансового отчета для пользователя: " + username + ", месяц: " + month + ", год: " + year + ", формат: " + format);
-
         JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/total_report.jrxml");
 
         Map<String, Object> parameters = new HashMap<>();
@@ -364,7 +344,4 @@ public class ReportServiceImpl implements ReportService {
 
         return exportReport(jasperPrint, format, "total_report");
     }
-
-
-
 }

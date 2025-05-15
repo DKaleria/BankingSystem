@@ -4,16 +4,15 @@ import java.time.LocalDate;
 
 public class AccountDTO {
     private String username;
-    private LocalDate birthDate; // Дата рождения
+    private LocalDate birthDate;
     private String firstname;
     private String lastname;
-    private String password; // Пароль
+    private String password;
     private String email;
-    private LocalDate registrationDate; // Дата регистрации
+    private LocalDate registrationDate;
     private boolean active;
-    private String role; // Роль
+    private String role;
 
-    // Конструкторы
     public AccountDTO() {}
 
     public AccountDTO(String username, LocalDate birthDate, String firstname, String lastname, String password, String email, LocalDate registrationDate, boolean active, String role) {
@@ -28,7 +27,6 @@ public class AccountDTO {
         this.role = role;
     }
 
-    // Геттеры и сеттеры
     public String getUsername() {
         return username;
     }

@@ -4,11 +4,9 @@ import by.grgu.analysisservice.service.AnalysisService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
 
 @Controller
 @RequestMapping("/analysis")
@@ -22,8 +20,6 @@ public class AnalysisController {
 
     @GetMapping
     public String showAnalysisPage(Model model) {
-        System.out.println("📌 Открытие страницы анализа");
-
         model.addAttribute("username", "—");
         model.addAttribute("balance", "—");
         model.addAttribute("expensePercentage", "—");
@@ -40,8 +36,6 @@ public class AnalysisController {
                                   @RequestParam int month,
                                   @RequestParam int year,
                                   Model model) {
-        System.out.println("📌 Запрос данных анализа, username: " + username);
-
         try {
             BigDecimal balance = analysisService.getTotalBalance(username, month, year);
             BigDecimal expensePercentage = analysisService.getExpensePercentage(username, month, year);
@@ -58,9 +52,9 @@ public class AnalysisController {
 
             return "analysis";
         } catch (Exception e) {
-            System.err.println("❌ Ошибка в `getAnalysisData`: " + e.getMessage());
+            System.err.println("Ошибка в `getAnalysisData`: " + e.getMessage());
             model.addAttribute("errorMessage", "Ошибка при загрузке данных: " + e.getMessage());
-            return "analysis"; // Возвращаем страницу с сообщением об ошибке
+            return "analysis";
         }
     }
 

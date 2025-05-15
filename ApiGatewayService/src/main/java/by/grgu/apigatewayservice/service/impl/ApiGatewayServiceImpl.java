@@ -29,7 +29,6 @@ public class ApiGatewayServiceImpl implements ApiGatewayService {
         userToken.setCreatedAt(LocalDateTime.now());
         userToken.setExpiresAt(LocalDateTime.now().plusHours(1));
 
-        System.out.println("Перед сохранением в апигетвей сервисе:\n " + "токен: " + token + " юзернейм: " + username);
         userTokenRepository.save(userToken);
     }
 }

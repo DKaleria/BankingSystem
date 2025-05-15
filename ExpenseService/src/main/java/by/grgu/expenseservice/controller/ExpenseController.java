@@ -3,7 +3,6 @@ package by.grgu.expenseservice.controller;
 import by.grgu.expenseservice.database.entity.Expense;
 import by.grgu.expenseservice.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,6 @@ public class ExpenseController {
                               @RequestParam(value = "month", required = false) Integer month,
                               @RequestParam(value = "year", required = false) Integer year,
                               Model model) {
-        System.out.println("📌 Запрос в /expenses, username: " + username);
 
         model.addAttribute("username", username);
         model.addAttribute("expenseType", expenseType);
@@ -38,9 +36,9 @@ public class ExpenseController {
 
         List<Expense> expenses;
         if ("monthly".equals(expenseType) && (month == null || year == null)) {
-            System.err.println("⚠️ Ошибка: месяц и год не указаны!");
-            model.addAttribute("errorMessage", "❌ Выберите месяц и год!");
-            expenses = new ArrayList<>(); // ✅ Отправляем пустой список
+            System.err.println("Ошибка: месяц и год не указаны!");
+            model.addAttribute("errorMessage", "Выберите месяц и год!");
+            expenses = new ArrayList<>();
         } else if ("monthly".equals(expenseType)) {
             expenses = expenseService.getExpensesForMonth(username, month, year);
         } else {
@@ -58,12 +56,10 @@ public class ExpenseController {
                                      @RequestParam(required = false) Integer month,
                                      @RequestParam(required = false) Integer year,
                                      Model model) {
-        System.out.println("📌 Запрос на расходы за месяц, username: " + username);
-
         if (month == null || year == null) {
-            System.err.println("❌ Ошибка: `month` или `year` не переданы!");
+            System.err.println("Ошибка: `month` или `year` не переданы!");
             model.addAttribute("errorMessage", "Выберите месяц и год!");
-            return "expense"; // ✅ Возвращаем страницу с предупреждением
+            return "expense";
         }
 
         List<Expense> expenses = expenseService.getExpensesForMonth(username, month, year);
@@ -78,29 +74,26 @@ public class ExpenseController {
 
     @PostMapping("/add-expense")
     public String addExpense(@RequestHeader("username") String username, @ModelAttribute Expense expense, Model model) {
-        System.out.println("📌 Запрос на добавление расхода, username: " + username);
 
         expense.setUsername(username);
 
         try {
             expenseService.createExpense(expense);
         } catch (IllegalArgumentException e) {
-            System.out.println("❌ Ошибка: " + e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage()); // ✅ Передаем ошибку в Thymeleaf
-            return getUserExpenses(username, model); // ✅ Возвращаем страницу расходов с предупреждением
+            System.out.println("Ошибка: " + e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            return getUserExpenses(username, model);
         }
 
-        return getUserExpenses(username, model); // ✅ Перенаправляем на страницу расходов
+        return getUserExpenses(username, model);
     }
 
     @GetMapping("/user-expenses")
     public String getUserExpenses(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Запрос в /user-expenses от API Gateway, username: " + username);
-
         List<Expense> expenses = expenseService.getAllExpenses(username);
 
         if (expenses == null || expenses.isEmpty()) {
-            System.out.println("⚠️ У пользователя пока нет расходов, передаем пустой список.");
+            System.out.println("У пользователя пока нет расходов, передаем пустой список.");
             expenses = new ArrayList<>();
         }
 
@@ -118,15 +111,12 @@ public class ExpenseController {
     public BigDecimal getTotalExpense(@RequestHeader("username") String username,
                                       @RequestParam int month,
                                       @RequestParam int year) {
-        System.out.println("📌 Запрос на total от API Gateway, username: " + username);
         return expenseService.getTotalExpenseForMonth(username, month, year);
     }
 
     @GetMapping("/{username}/total")
     @ResponseBody
     public BigDecimal getTotalExpenseForUser(@PathVariable String username) {
-        System.out.println("📌 Запрос общей суммы расходов пользователя: " + username);
-
         List<Expense> expenses = expenseService.getAllExpenses(username);
 
         BigDecimal totalExpense = expenses.stream()
@@ -139,20 +129,17 @@ public class ExpenseController {
 
     @GetMapping("/all")
     public String getAllExpenses(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Запрос всех расходов, username: " + username);
-
         List<Expense> expenses = expenseService.getAllExpenses(username);
 
         model.addAttribute("username", username);
         model.addAttribute("expenses", expenses);
 
-        return "expense"; // ✅ Показываем страницу со всеми расходами
+        return "expense";
     }
 
 
     @GetMapping("/show")
     public String showExpense(@RequestHeader("username") String username, Model model) {
-        System.out.println("📌 Запрос в /show от API Gateway, username: " + username);
         model.addAttribute("username", username);
         return "expense";
     }
@@ -160,12 +147,10 @@ public class ExpenseController {
     @GetMapping("/{username}/all")
     @ResponseBody
     public List<Expense> getAllExpensesForUser(@PathVariable String username) {
-        System.out.println("📌 Запрос всех расходов пользователя: " + username);
-
         List<Expense> expenses = expenseService.getAllExpenses(username);
 
         if (expenses.isEmpty()) {
-            System.out.println("⚠️ У пользователя пока нет расходов, передаем пустой список.");
+            System.out.println("У пользователя пока нет расходов, передаем пустой список.");
         }
 
         return expenses;

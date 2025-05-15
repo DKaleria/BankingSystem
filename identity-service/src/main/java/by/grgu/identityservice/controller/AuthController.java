@@ -1,7 +1,5 @@
 package by.grgu.identityservice.controller;
 
-import by.grgu.identityservice.database.entity.AuthenticationRequest;
-import by.grgu.identityservice.database.entity.AuthenticationResponse;
 import by.grgu.identityservice.database.entity.RegistrationRequest;
 import by.grgu.identityservice.database.entity.User;
 import by.grgu.identityservice.exceptions.ErrorMessage;
@@ -44,8 +42,6 @@ public class AuthController {
 
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
-        System.out.println("Страница регистрации вызывается");
-        System.out.println("Registration page called");
         model.addAttribute("createUserRequest", new RegistrationRequest());
         return "registration";
     }
@@ -58,9 +54,6 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@ModelAttribute RegistrationRequest request,
                                            HttpServletResponse response) {
-        System.out.println("Register method called");
-        System.out.println("Password in controller method: " + request.getPassword());
-
         userService.register(request);
 
         return "registration_success";
@@ -73,37 +66,6 @@ public class AuthController {
         List<User> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
-
-
-    /*@SneakyThrows
-    @PostMapping("/authenticate")
-    public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
-        System.out.println("Authenticate method called with username: " + username);
-
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            if (authentication.isAuthenticated()) {
-                String accessToken = jwtTokenUtil.generateAccessToken(authentication);
-                String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
-                System.out.println("Отправка токена в UserService");
-                userService.sendToken(username, accessToken);
-
-                String role = authentication.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .findFirst()
-                        .orElse("USER");
-
-                return "ADMIN".equals(role) ? "redirect:/admin/users" : "redirect:/accounts/account";
-            }
-        } catch (BadCredentialsException e) {
-            redirectAttributes.addFlashAttribute("error", "❌ Неверное имя пользователя или пароль.");
-        }
-
-        return "redirect:/identity/login";
-    }*/
 
     @SneakyThrows
     @PostMapping("/authenticate")
@@ -126,40 +88,11 @@ public class AuthController {
                 return "ADMIN".equals(role) ? "redirect:http://localhost:8082/admin/users" : "redirect:http://localhost:8082/accounts/account";
             }
         } catch (BadCredentialsException e) {
-            redirectAttributes.addFlashAttribute("error", "❌ Неверное имя пользователя или пароль.");
+            redirectAttributes.addFlashAttribute("error", "Неверное имя пользователя или пароль.");
         }
 
         return "redirect:http://localhost:8082/identity/login";
     }
-
-
-
-   /*@SneakyThrows
-    @PostMapping("/authenticate")
-    public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
-        System.out.println("Authenticate method called with username: " + username);
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            if (authentication.isAuthenticated()) {
-                String accessToken = jwtTokenUtil.generateAccessToken(authentication);
-                String refreshToken = jwtTokenUtil.generateRefreshToken(authentication);
-
-                System.out.println("Отправка токена в UserService");
-                userService.sendToken(username, accessToken);
-
-                // Перенаправление на страницу аккаунта
-                return "redirect:http://localhost:8082/accounts/account";
-            }
-        } catch (BadCredentialsException e) {
-            redirectAttributes.addFlashAttribute("error", "Неверное имя пользователя или пароль.");
-        }
-
-        // Перенаправление на страницу логина с ошибкой
-        return "redirect:/identity/login";
-    }*/
 
     @GetMapping("/me")
     public ResponseEntity<Object> getCurrentUser() {
@@ -182,16 +115,6 @@ public class AuthController {
         }
     }
 
-
-    /*@GetMapping("/validate-token")
-    public ResponseEntity<Void> validateToken(@RequestParam("Authorization") String authorization) {
-        if (jwtTokenUtil.validateToken(authorization)) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }*/
-
     @GetMapping("/exit")
     public String showExitPage() {
         return "logout";
@@ -209,5 +132,4 @@ public class AuthController {
 
         return "login";
     }
-
 }

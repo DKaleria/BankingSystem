@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -23,15 +22,12 @@ public class ExpenseApiController {
     public ResponseEntity<List<ExpenseDTO>> getMonthlyExpensesApi(@RequestHeader("username") String username,
                                                                   @RequestParam int month,
                                                                   @RequestParam int year) {
-        System.out.println("📌 API-запрос на JSON-расходы за месяц, username: " + username);
-
         List<Expense> expenses = expenseService.getExpensesForMonth(username, month, year);
 
-        // ✅ Теперь `description` точно передается!
         List<ExpenseDTO> expenseDTOs = expenses.stream()
                 .map(expense -> new ExpenseDTO(expense.getUsername(),
                         BigDecimal.valueOf(expense.getAmount()),
-                        expense.getDescription()))  // ✅ Описание добавлено!
+                        expense.getDescription()))
                 .toList();
 
         return ResponseEntity.ok()

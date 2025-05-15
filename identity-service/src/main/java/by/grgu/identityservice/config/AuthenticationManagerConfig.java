@@ -31,22 +31,4 @@ public class AuthenticationManagerConfig {
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
-
-   /* @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
-        return authConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(getUserDetailsService());
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
-
-    @Bean
-    public UserDetailsService getUserDetailsService() {
-        return userService;
-    }*/
 }

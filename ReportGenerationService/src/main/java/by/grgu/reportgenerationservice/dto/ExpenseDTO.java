@@ -1,7 +1,6 @@
 package by.grgu.reportgenerationservice.dto;
 
 import lombok.*;
-
 import java.math.BigDecimal;
 
 @Builder
