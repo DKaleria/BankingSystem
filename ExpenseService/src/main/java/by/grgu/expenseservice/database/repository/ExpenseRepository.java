@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
+    @Query("SELECT DISTINCT e.description FROM Expense e WHERE e.username = :username")
+    List<String> getExpenseDescriptions(@Param("username") String username);
 
     List<Expense> findByUsername(String username); // ✅ Запрос расходов по `username`
 
@@ -20,4 +22,11 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT e FROM Expense e WHERE e.username = :username AND MONTH(e.date) = :month AND YEAR(e.date) = :year")
     List<Expense> findByUsernameAndMonth(@Param("username") String username, @Param("month") int month, @Param("year") int year);
+
+    @Query("SELECT e FROM Expense e WHERE e.username = :username AND e.description = :description AND e.date BETWEEN :startDate AND :endDate")
+    List<Expense> getExpenseByDescriptionForMonth(@Param("username") String username,
+                                                  @Param("description") String description,
+                                                  @Param("startDate") LocalDate startDate,
+                                                  @Param("endDate") LocalDate endDate);
+
 }

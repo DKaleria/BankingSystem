@@ -26,6 +26,13 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
+    public List<String> getExpenseDescriptions(String username) {
+        return expenseRepository.getExpenseDescriptions(username);
+    }
+
+
+
+    @Override
     public Expense createExpense(Expense expense) {
         String totalIncomeUrl = "http://localhost:8082/incomes/" + expense.getUsername() + "/total";
         ResponseEntity<BigDecimal> incomeResponse = restTemplate.getForEntity(totalIncomeUrl, BigDecimal.class);
@@ -77,4 +84,13 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .collect(Collectors.groupingBy(Expense::getSource,
                         Collectors.reducing(BigDecimal.ZERO, expense -> BigDecimal.valueOf(expense.getAmount()), BigDecimal::add)));
     }
+
+    @Override
+    public List<Expense> getExpenseByDescriptionForMonth(String username, String description, int month, int year) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+
+        return expenseRepository.getExpenseByDescriptionForMonth(username, description, startDate, endDate);
+    }
+
 }

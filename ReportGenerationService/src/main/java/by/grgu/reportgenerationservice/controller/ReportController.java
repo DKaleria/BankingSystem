@@ -69,6 +69,23 @@ public class ReportController {
         return ResponseEntity.ok(sources);
     }
 
+    @PostMapping("/expense-by-description")
+    public ResponseEntity<String> generateExpenseByDescriptionReport(
+            @RequestHeader("username") String username,
+            @RequestParam int month,
+            @RequestParam int year,
+            @RequestParam String description,
+            @RequestParam String format) {
+
+        try {
+            String reportPath = reportService.generateExpenseByDescriptionReport(username, format, month, year, description);
+            return ResponseEntity.ok(reportPath);
+        } catch (JRException | IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при создании отчета: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/total-monthly-expense")
     public ResponseEntity<BigDecimal> getMonthlyExpense(
             @RequestHeader("username") String username,
@@ -141,6 +158,7 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
+
     @PostMapping("/total-expense-report")
     public String generateTotalExpenseReport(@RequestHeader("username") String username,
                                              @RequestParam Map<String, String> params,
@@ -197,6 +215,12 @@ public class ReportController {
                     year = Integer.parseInt(params.get("year"));
                     String source = params.get("source"); // ✅ Добавляем источник
                     outputPath = reportService.generateIncomeBySourceReport(username, reportFormat, month, year, source);
+                    break;
+                case "expense-by-description": // ✅ Теперь поддерживается "Расходы по описанию"
+                    month = Integer.parseInt(params.get("month"));
+                    year = Integer.parseInt(params.get("year"));
+                    String description = params.get("description"); // ✅ Извлекаем описание расхода
+                    outputPath = reportService.generateExpenseByDescriptionReport(username, reportFormat, month, year, description);
                     break;
                 default:
                     model.addAttribute("reportMessage", "❌ Неверный тип отчета");

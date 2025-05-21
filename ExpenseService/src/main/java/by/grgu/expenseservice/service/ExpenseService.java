@@ -8,6 +8,8 @@ import java.util.Map;
 public interface ExpenseService {
     Expense createExpense(Expense expense);
 
+    List<String> getExpenseDescriptions(String username);
+
     List<Expense> getAllExpenses(String username);
 
     BigDecimal getTotalExpenseForMonth(String username, int month, int year);
@@ -15,4 +17,6 @@ public interface ExpenseService {
     Map<String, BigDecimal> getExpenseBreakdown(String username, int month, int year);
 
     List<Expense> getExpensesForMonth(String username, int month, int year);
+
+    List<Expense> getExpenseByDescriptionForMonth(String username, String description, int month, int year);
 }

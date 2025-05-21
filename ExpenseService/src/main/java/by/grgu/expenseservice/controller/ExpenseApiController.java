@@ -44,6 +44,31 @@ public class ExpenseApiController {
         Map<String, BigDecimal> breakdown = expenseService.getExpenseBreakdown(username, month, year);
         return ResponseEntity.ok(breakdown);
     }
+    @GetMapping("/monthly/description")
+    public ResponseEntity<List<ExpenseDTO>> getExpenseByDescriptionApi(@RequestHeader("username") String username,
+                                                                       @RequestParam String description,
+                                                                       @RequestParam int month,
+                                                                       @RequestParam int year) {
+
+        List<Expense> expenses = expenseService.getExpenseByDescriptionForMonth(username, description, month, year);
+
+        List<ExpenseDTO> expenseDTOs = expenses.stream()
+                .map(expense -> new ExpenseDTO(expense.getUsername(),
+                        BigDecimal.valueOf(expense.getAmount()),
+                        expense.getDescription()))
+                .toList();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(expenseDTOs);
+    }
+
+    @GetMapping("/descriptions")
+    public ResponseEntity<List<String>> getExpenseDescriptions(@RequestHeader("username") String username) {
+        List<String> descriptions = expenseService.getExpenseDescriptions(username);
+        return ResponseEntity.ok(descriptions);
+    }
+
 }
 
 

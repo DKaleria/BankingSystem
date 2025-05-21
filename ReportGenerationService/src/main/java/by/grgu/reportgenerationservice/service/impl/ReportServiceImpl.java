@@ -25,7 +25,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -403,5 +402,60 @@ public class ReportServiceImpl implements ReportService {
 
         return exportReport(jasperPrint, format, "income-by-source");
     }
+
+    @Override
+    public String generateExpenseByDescriptionReport(
+            String username, String format, int month, int year, String description)
+            throws JRException, IOException {
+
+        JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/expense-by-description.jrxml");
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("username", username);
+        parameters.put("month", month);
+        parameters.put("year", year);
+        parameters.put("description", description);
+
+        // ✅ Запрос данных через API Gateway
+        String url = API_GATEWAY_URL + "/api/expenses/monthly?month=" + month + "&year=" + year;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("username", username);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<ExpenseDTO[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, ExpenseDTO[].class);
+        List<ExpenseDTO> expenses = Arrays.asList(response.getBody());
+
+        // ✅ Проверяем, есть ли данные
+        if (expenses.isEmpty()) {
+            throw new RuntimeException("❌ Ошибка: Нет данных для отчета!");
+        }
+
+        // ✅ Формируем список данных для отчета (используем `description`)
+        List<Map<String, Object>> filteredData = expenses.stream()
+                .filter(expense -> expense.getDescription().equals(description)) // ✅ Фильтрация по `description`
+                .map(expense -> {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("description", expense.getDescription());
+                    row.put("amount", expense.getAmount());
+                    return row;
+                })
+                .collect(Collectors.toList());
+
+        // ✅ Вычисляем итоговую сумму расходов по описанию
+        BigDecimal totalExpenseByDescription = filteredData.stream()
+                .map(row -> (BigDecimal) row.get("amount"))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        parameters.put("totalExpenseByDescription", totalExpenseByDescription); // ✅ Передаем итоговую сумму в отчет
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(filteredData);
+
+        System.out.println("🔍 Проверяем `totalExpenseByDescription`: " + totalExpenseByDescription);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        return exportReport(jasperPrint, format, "expense-by-description");
+    }
+
 
 }

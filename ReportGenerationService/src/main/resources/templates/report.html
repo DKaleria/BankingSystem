@@ -140,7 +140,8 @@
                         <option value="monthly-expense">Расходы за месяц</option>
                         <option value="monthly-income">Доходы за месяц</option>
                         <option value="total-report">Общий финансовый отчет</option>
-                        <option value="income-by-source">Доходы по источнику</option> <!-- ✅ Новый отчет -->
+                        <option value="income-by-source">Доходы по источнику</option>
+                        <option value="expense-by-description">Расходы по описанию</option> <!-- ✅ Новый отчет -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -163,6 +164,12 @@
                     <label for="source">Источник дохода:</label>
                     <select id="source" name="source" class="form-control"></select>
                 </div>
+
+                <div id="descriptionSelection" class="form-group" style="display: none;">
+                    <label for="description">Описание расхода:</label>
+                    <select id="description" name="description" class="form-control"></select>
+                </div>
+
 
                 <button type="submit" class="btn btn-custom">Создать отчет</button>
             </form>
@@ -187,28 +194,24 @@
     document.getElementById("reportType").addEventListener("change", function () {
         let selectedReport = this.value;
         document.getElementById("monthYearSelection").style.display =
-            selectedReport.includes("monthly") || selectedReport === "total-report" || selectedReport === "income-by-source" ? "block" : "none";
+            selectedReport.includes("monthly") || selectedReport === "total-report" || selectedReport === "income-by-source" || selectedReport === "expense-by-description" ? "block" : "none";
         document.getElementById("sourceSelection").style.display =
             selectedReport === "income-by-source" ? "block" : "none";
+        document.getElementById("descriptionSelection").style.display =
+            selectedReport === "expense-by-description" ? "block" : "none";
 
         if (selectedReport === "income-by-source") {
             updateIncomeSources();
+        }
+        if (selectedReport === "expense-by-description") {
+            updateExpenseDescriptions();
         }
     });
 
     function updateIncomeSources() {
         fetch('/api/incomes/sources')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`❌ Ошибка: ${response.status} (${response.statusText})`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (!Array.isArray(data)) {
-                    throw new Error("❌ API вернул объект вместо массива!");
-                }
-                console.log("✅ Полученные источники:", data);
                 let sourceDropdown = document.getElementById("source");
                 sourceDropdown.innerHTML = "";
                 data.forEach(source => {
@@ -218,24 +221,32 @@
                     sourceDropdown.appendChild(option);
                 });
             })
-            .catch(error => console.error(error.message));
+            .catch(error => console.error("❌ Ошибка загрузки источников доходов:", error));
     }
 
-    document.getElementById("reportFormat").addEventListener("change", function () {
-        let selectedFormat = this.value;
-        let viewButton = document.getElementById("viewButton");
-        let downloadButton = document.getElementById("downloadButton");
+    function updateExpenseDescriptions() {
+        fetch('/api/expenses/descriptions')
+            .then(response => response.json())
+            .then(data => {
+                let descriptionDropdown = document.getElementById("description");
+                descriptionDropdown.innerHTML = "";
+                data.forEach(description => {
+                    let option = document.createElement("option");
+                    option.value = description;
+                    option.textContent = description;
+                    descriptionDropdown.appendChild(option);
+                });
+                console.log("✅ Загруженные категории расходов:", data);
+            })
+            .catch(error => console.error("❌ Ошибка загрузки описаний расходов:", error));
+    }
 
-        if (selectedFormat === "text") {
-            viewButton.style.display = "none";  // ✅ Скрываем кнопку "Просмотреть отчет"
-            downloadButton.style.display = "inline-block";  // ✅ Показываем кнопку "Скачать отчет"
-        } else {
-            viewButton.style.display = "inline-block";
-            downloadButton.style.display = "none";
-        }
+
+    window.addEventListener("load", function () {
+        updateIncomeSources();
+        updateExpenseDescriptions();
     });
-
-    window.addEventListener("load", updateIncomeSources);
 </script>
+
 </body>
 </html>

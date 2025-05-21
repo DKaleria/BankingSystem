@@ -27,4 +27,8 @@ public interface ReportService {
             throws JRException, IOException;
 
     List<String> getIncomeSources(String username);
+
+    String generateExpenseByDescriptionReport(
+            String username, String format, int month, int year, String description)
+            throws JRException, IOException;
 }
