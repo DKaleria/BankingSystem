@@ -46,6 +46,13 @@ public class IncomeServiceImpl implements IncomeService {
         return incomeRepository.save(income);
     }
 
+    @Override
+    public List<Income> getIncomeBySourceForMonth(String username, String source, int month, int year) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+
+        return incomeRepository.getIncomeBySourceForMonth(username, source, startDate, endDate);
+    }
 
     @Override
     public List<Income> getAllIncomes(String username) {

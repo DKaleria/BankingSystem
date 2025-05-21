@@ -44,5 +44,25 @@ public class IncomeApiController {
         return ResponseEntity.ok(sources);
     }
 
+    @GetMapping("/monthly/source")
+    public ResponseEntity<List<IncomeDTO>> getIncomeBySourceApi(@RequestHeader("username") String username,
+                                                                @RequestParam String source,
+                                                                @RequestParam int month,
+                                                                @RequestParam int year) {
+
+        List<Income> incomes = incomeService.getIncomeBySourceForMonth(username, source, month, year);
+
+        List<IncomeDTO> incomeDTOs = incomes.stream()
+                .map(income -> new IncomeDTO(income.getUsername(),
+                        BigDecimal.valueOf(income.getAmount()),
+                        income.getSource()))
+                .toList();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(incomeDTOs);
+    }
+
+
 
 }

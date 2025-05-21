@@ -197,7 +197,7 @@
     });
 
     function updateIncomeSources() {
-        fetch('/api/income-sources')
+        fetch('/api/incomes/sources')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`❌ Ошибка: ${response.status} (${response.statusText})`);

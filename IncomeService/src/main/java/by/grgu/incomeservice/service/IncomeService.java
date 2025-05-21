@@ -15,5 +15,7 @@ public interface IncomeService {
 
     BigDecimal getTotalIncomeForUser(String username);
 
+    List<Income> getIncomeBySourceForMonth(String username, String source, int month, int year);
+
     List<String> getIncomeSources(String username);
 }

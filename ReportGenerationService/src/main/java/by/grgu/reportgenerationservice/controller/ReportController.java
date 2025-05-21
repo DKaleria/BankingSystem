@@ -41,7 +41,7 @@ public class ReportController {
         model.addAttribute("totalExpense", totalExpense);
         model.addAttribute("totalIncome", totalIncome);
 
-        System.out.println("Model: "+ model);
+        System.out.println("Model: " + model);
         return "report";
     }
 
@@ -163,6 +163,7 @@ public class ReportController {
 
         return "report";
     }
+
     @PostMapping("/create")
     public String createReport(@RequestHeader("username") String username,
                                @RequestParam Map<String, String> params,
@@ -187,12 +188,18 @@ public class ReportController {
                     outputPath = reportService.generateMonthlyIncomeReport(username, month, year, reportFormat);
                     break;
                 case "total-report":
-                    month = Integer.parseInt(params.get("month")); // Добавьте, если нужно
-                    year = Integer.parseInt(params.get("year")); // Добавьте, если нужно
+                    month = Integer.parseInt(params.get("month"));
+                    year = Integer.parseInt(params.get("year"));
                     outputPath = reportService.generateTotalReport(username, month, year, reportFormat);
                     break;
+                case "income-by-source": // ✅ Теперь поддерживается "Доходы по источнику"
+                    month = Integer.parseInt(params.get("month"));
+                    year = Integer.parseInt(params.get("year"));
+                    String source = params.get("source"); // ✅ Добавляем источник
+                    outputPath = reportService.generateIncomeBySourceReport(username, reportFormat, month, year, source);
+                    break;
                 default:
-                    model.addAttribute("reportMessage", "Неверный тип отчета");
+                    model.addAttribute("reportMessage", "❌ Неверный тип отчета");
                     return "report";
             }
 
@@ -205,6 +212,7 @@ public class ReportController {
 
         return "report";
     }
+
 
     @PostMapping("/monthly-expense")
     public String generateMonthlyExpenseReport(@RequestHeader("username") String username,
@@ -229,6 +237,7 @@ public class ReportController {
 
         return "report";
     }
+
     @GetMapping("/view")
     public ResponseEntity<Resource> viewReport(@RequestParam String path, @RequestParam String format) {
         File file = new File(path);

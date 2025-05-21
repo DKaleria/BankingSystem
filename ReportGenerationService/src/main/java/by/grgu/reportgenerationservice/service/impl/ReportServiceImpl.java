@@ -356,21 +356,30 @@ public class ReportServiceImpl implements ReportService {
             String username, String format, int month, int year, String selectedSource)
             throws JRException, IOException {
 
-        JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/income_by_source.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/income-by-source.jrxml");
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("username", username);
         parameters.put("month", month);
         parameters.put("year", year);
-        parameters.put("selectedSource", selectedSource); // ✅ Указанный источник дохода
+        parameters.put("selectedSource", selectedSource);
 
         // ✅ Запрос данных через API Gateway
-        String url = API_GATEWAY_URL + "incomes/" + username + "?month=" + month + "&year=" + year;
-        List<IncomeDTO> incomes = Arrays.asList(restTemplate.getForObject(url, IncomeDTO[].class));
+        String url = API_GATEWAY_URL + "/api/incomes/monthly/source?source=" + selectedSource + "&month=" + month + "&year=" + year;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("username", username);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        // ✅ Фильтруем данные только по `selectedSource`
+        ResponseEntity<IncomeDTO[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, IncomeDTO[].class);
+        List<IncomeDTO> incomes = Arrays.asList(response.getBody());
+
+        // ✅ Проверяем, есть ли данные
+        if (incomes.isEmpty()) {
+            throw new RuntimeException("❌ Ошибка: Нет данных для отчета!");
+        }
+
+        // ✅ Формируем список данных для отчета
         List<Map<String, Object>> filteredData = incomes.stream()
-                .filter(income -> income.getSource().equals(selectedSource))
                 .map(income -> {
                     Map<String, Object> row = new HashMap<>();
                     row.put("source", income.getSource());
@@ -379,11 +388,20 @@ public class ReportServiceImpl implements ReportService {
                 })
                 .collect(Collectors.toList());
 
+        // ✅ Вычисляем итоговую сумму доходов по источнику
+        BigDecimal totalIncomeBySource = filteredData.stream()
+                .map(row -> (BigDecimal) row.get("amount"))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        parameters.put("totalIncomeBySource", totalIncomeBySource); // ✅ Передаем итоговую сумму в отчет
+
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(filteredData);
+
+        System.out.println("🔍 Проверяем `totalIncomeBySource`: " + totalIncomeBySource);
+
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-        // ✅ Экспорт отчета в нужный формат
-        return exportReport(jasperPrint, format, "income_by_source");
+        return exportReport(jasperPrint, format, "income-by-source");
     }
 
 }
