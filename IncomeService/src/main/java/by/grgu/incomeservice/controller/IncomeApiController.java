@@ -39,6 +39,10 @@ public class IncomeApiController {
     @GetMapping("/sources")
     public ResponseEntity<List<String>> getIncomeSources(@RequestHeader("username") String username) {
         List<String> sources = incomeService.getIncomeSources(username);
+
+        System.out.println("✅ Источники дохода: " + sources); // ✅ Проверяем, что данные загружаются
         return ResponseEntity.ok(sources);
     }
+
+
 }

@@ -7,6 +7,7 @@ import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -228,7 +229,6 @@ public class ReportController {
 
         return "report";
     }
-
     @GetMapping("/view")
     public ResponseEntity<Resource> viewReport(@RequestParam String path, @RequestParam String format) {
         File file = new File(path);
@@ -242,7 +242,10 @@ public class ReportController {
                     break;
                 case "text":
                     mediaType = MediaType.TEXT_PLAIN;
-                    break;
+                    return ResponseEntity.ok()
+                            .contentType(mediaType)
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName()) // ✅ Файл будет скачиваться
+                            .body(resource);
                 case "png":
                     mediaType = MediaType.IMAGE_PNG;
                     break;
@@ -256,6 +259,7 @@ public class ReportController {
         }
         return ResponseEntity.notFound().build();
     }
+
 
     @PostMapping("/monthly-income")
     public String generateMonthlyIncomeReport(@RequestHeader("username") String username,

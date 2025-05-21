@@ -161,9 +161,7 @@
 
                 <div id="sourceSelection" class="form-group" style="display: none;"> <!-- ✅ Выбор источника дохода -->
                     <label for="source">Источник дохода:</label>
-                    <select id="source" name="source" class="form-control">
-                        <!-- Источники дохода будут загружаться динамически через JavaScript -->
-                    </select>
+                    <select id="source" name="source" class="form-control"></select>
                 </div>
 
                 <button type="submit" class="btn btn-custom">Создать отчет</button>
@@ -177,8 +175,8 @@
     </div>
     <div th:if="${reportPath}" style="margin-top: 20px;">
         <h3>Ваш отчет:</h3>
-        <a th:href="@{/reports/view(path=${reportPath}, format=${reportFormat})}" class="btn btn-custom">Просмотреть
-            отчет</a>
+        <a id="viewButton" th:href="@{/reports/view(path=${reportPath}, format=${reportFormat})}" class="btn btn-custom">Просмотреть отчет</a>
+        <a id="downloadButton" th:href="@{/reports/view(path=${reportPath}, format=${reportFormat})}" download class="btn btn-custom" style="display: none;">Скачать отчет</a>
     </div>
 </div>
 
@@ -188,31 +186,56 @@
 <script>
     document.getElementById("reportType").addEventListener("change", function () {
         let selectedReport = this.value;
-
-        // Меняем видимость выбора месяца и года
         document.getElementById("monthYearSelection").style.display =
             selectedReport.includes("monthly") || selectedReport === "total-report" || selectedReport === "income-by-source" ? "block" : "none";
-
-        // Показываем список источников, если выбран отчет доходов по источнику
         document.getElementById("sourceSelection").style.display =
             selectedReport === "income-by-source" ? "block" : "none";
 
         if (selectedReport === "income-by-source") {
-            fetch('/api/income-sources') // ✅ Загружаем список источников
-                .then(response => response.json())
-                .then(data => {
-                    let sourceDropdown = document.getElementById("source");
-                    sourceDropdown.innerHTML = "";
-                    data.forEach(source => {
-                        let option = document.createElement("option");
-                        option.value = source;
-                        option.textContent = source;
-                        sourceDropdown.appendChild(option);
-                    });
-                });
+            updateIncomeSources();
         }
     });
-</script>
 
+    function updateIncomeSources() {
+        fetch('/api/income-sources')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`❌ Ошибка: ${response.status} (${response.statusText})`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data)) {
+                    throw new Error("❌ API вернул объект вместо массива!");
+                }
+                console.log("✅ Полученные источники:", data);
+                let sourceDropdown = document.getElementById("source");
+                sourceDropdown.innerHTML = "";
+                data.forEach(source => {
+                    let option = document.createElement("option");
+                    option.value = source;
+                    option.textContent = source;
+                    sourceDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error(error.message));
+    }
+
+    document.getElementById("reportFormat").addEventListener("change", function () {
+        let selectedFormat = this.value;
+        let viewButton = document.getElementById("viewButton");
+        let downloadButton = document.getElementById("downloadButton");
+
+        if (selectedFormat === "text") {
+            viewButton.style.display = "none";  // ✅ Скрываем кнопку "Просмотреть отчет"
+            downloadButton.style.display = "inline-block";  // ✅ Показываем кнопку "Скачать отчет"
+        } else {
+            viewButton.style.display = "inline-block";
+            downloadButton.style.display = "none";
+        }
+    });
+
+    window.addEventListener("load", updateIncomeSources);
+</script>
 </body>
 </html>

@@ -22,9 +22,12 @@ import org.springframework.web.client.RestTemplate;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -207,35 +210,39 @@ public class ReportServiceImpl implements ReportService {
                 Graphics2D g2d = bufferedImage.createGraphics();
                 g2d.drawImage(img, 0, 0, null);
                 g2d.dispose();
-                File outputFile = new File(outputPath);
-                try {
-                    ImageIO.write(bufferedImage, "png", outputFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                ImageIO.write(bufferedImage, "png", new File(outputPath));
                 break;
             case "text":
-                JRTextExporter exporter = createTextExporter(jasperPrint, outputPath);
-                exporter.exportReport();
-                break;
+                String textOutputPath = outputPath.replace(".text", ".txt");  // ✅ Используем `.txt`, чтобы избежать белого экрана
+
+                if (jasperPrint.getPages().isEmpty()) {
+                    throw new RuntimeException("❌ Ошибка: В отчёте нет данных!");
+                }
+
+                JRTextExporter textExporter = new JRTextExporter();
+                textExporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+                textExporter.setExporterOutput(new SimpleWriterExporterOutput(textOutputPath));
+
+                SimpleTextReportConfiguration textConfig = new SimpleTextReportConfiguration();
+                textConfig.setCharWidth(10f);
+                textConfig.setPageWidthInChars(200);
+                textConfig.setPageHeightInChars(50);
+                textExporter.setConfiguration(textConfig);
+
+                textExporter.exportReport();
+
+                // ✅ Проверяем, записан ли текст в файл
+                if (Files.size(Paths.get(textOutputPath)) == 0) {
+                    throw new RuntimeException("❌ Ошибка: Файл отчёта пуст!");
+                }
+
+                return textOutputPath;
+
+
             default:
                 throw new IllegalArgumentException("Неподдерживаемый формат отчета: " + format);
         }
         return outputPath;
-    }
-
-    private JRTextExporter createTextExporter(JasperPrint jasperPrint, String outputPath) {
-        JRTextExporter exporter = new JRTextExporter();
-        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(new SimpleWriterExporterOutput(outputPath));
-
-        SimpleTextReportConfiguration configuration = new SimpleTextReportConfiguration();
-        configuration.setCharWidth(5f); // Ширина символа в пикселях
-        configuration.setPageWidthInChars(120); // Количество символов в строке страницы
-        configuration.setPageHeightInChars(40); // Количество строк на странице (можно настроить)
-
-        exporter.setConfiguration(configuration);
-        return exporter;
     }
 
     @Override
@@ -298,7 +305,7 @@ public class ReportServiceImpl implements ReportService {
         JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/total_report.jrxml");
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("username", username);
+        parameters.put("username", new String(username.getBytes(), Charset.forName("UTF-8")));
         parameters.put("month", month);
         parameters.put("year", year);
 
@@ -309,6 +316,7 @@ public class ReportServiceImpl implements ReportService {
         parameters.put("totalIncome", totalIncome);
         parameters.put("totalExpense", totalExpense);
         parameters.put("netSavings", netSavings);
+
 
         List<IncomeDTO> incomes = getIncomesForMonth(username, month, year);
         List<ExpenseDTO> expenses = getExpensesForMonth(username, month, year);
