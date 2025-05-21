@@ -24,6 +24,11 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
+    public List<String> getIncomeSources(String username) {
+        return incomeRepository.getDistinctIncomeSources(username);
+    }
+
+    @Override
     public Income createIncome(Income income) {
         String birthDateUrl = "http://localhost:8082/accounts/" + income.getUsername() + "/birthdate";
         ResponseEntity<LocalDate> response = restTemplate.getForEntity(birthDateUrl, LocalDate.class);

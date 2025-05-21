@@ -7,27 +7,32 @@ import by.grgu.accountservice.database.repository.AccountRepository;
 import by.grgu.accountservice.dto.AccDto;
 import by.grgu.accountservice.dto.AccountDTO;
 import by.grgu.accountservice.service.AccountService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.transaction.Transactional;
+import org.springframework.http.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepository;
+    private final RestTemplate restTemplate;
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, RestTemplate restTemplate) {
         this.accountRepository = accountRepository;
+        this.restTemplate = restTemplate;
     }
 
     public ResponseEntity<Void> createAccount(AccountRequest request) {
@@ -104,34 +109,46 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Account account = accountRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + username));
 
-        return new AccountDTO(account.getUsername(), account.getFirstname(), account.getLastname(), account.getEmail());
+        return new AccountDTO(account.getId(), account.getUsername(), account.getFirstname(), account.getLastname(), account.getEmail());
     }
 
-    public void updateAccountFields(String username, Map<String, String> updatedData) {
-        Account account = accountRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + username));
+    public boolean updateAccountFields(Map<String, String> updatedData, String token) {
+        System.out.println("🔄 Полученные данные в AccountService: " + updatedData);
 
-        updatedData.forEach((field, value) -> {
-            switch (field) {
-                case "firstname":
-                    account.setFirstname(value);
-                    break;
-                case "lastname":
-                    account.setLastname(value);
-                    break;
-                case "email":
-                    account.setEmail(value);
-                    break;
-                case "username":
-                    account.setUsername(value);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Недопустимое поле: " + field);
-            }
-        });
+        String username = updatedData.get("username");
 
-        accountRepository.save(account);
+        System.out.println("🔍 Ищем аккаунт по `username`: " + username);
+
+        Optional<Account> accountOptional = accountRepository.findByUsername(username);
+
+        if (accountOptional.isPresent()) {
+            Account account = accountOptional.get();
+            System.out.println("✅ Найден аккаунт: " + account.getUsername());
+
+            // ✅ Немедленно обновляем `username` в БД, чтобы он был актуальным
+            account.setUsername(username);
+
+            account.setFirstname(updatedData.get("firstname"));
+            account.setLastname(updatedData.get("lastname"));
+            account.setEmail(updatedData.get("email"));
+
+            accountRepository.save(account);
+            System.out.println("✅ Аккаунт успешно обновлен!");
+
+            return true;
+        } else {
+            System.err.println("❌ Ошибка: Аккаунт с username '" + username + "' не найден.");
+            return false;
+        }
     }
+
+
+    private HttpHeaders createHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token); // ✅ Устанавливаем токен
+        return headers;
+    }
+
     public List<AccDto> getAllAccounts() {
         return accountRepository.findAll().stream()
                 .map(this::convertToDto)

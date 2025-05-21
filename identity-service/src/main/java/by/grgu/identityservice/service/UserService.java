@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,8 +25,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -85,6 +89,7 @@ public class UserService implements UserDetailsService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
     private void createAccountForUser(User user) {
         AccountRequest accountRequest = AccountRequest.builder()
                 .username(user.getUsername())
@@ -137,31 +142,56 @@ public class UserService implements UserDetailsService {
         throw new RuntimeException("Authentication is not valid");
     }
 
-    public void sendToken(String username, String token) {
-        System.out.println("Отправка токена: " + token + " для пользователя: " + username);
-
-        sendTokenToApiGateway(username, token);
-    }
-
-    private void sendTokenToApiGateway(String username, String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-        headers.set("username", username);  // Добавляем username в заголовки
-
-        System.out.println("Заголовки перед отправкой в API Gateway: " + headers);
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        try {
-            ResponseEntity<Void> response = restTemplate.postForEntity(GATEWAY_SERVICE_URL, requestEntity, Void.class);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                System.out.println("Токен успешно отправлен в API Gateway");
-            } else {
-                System.out.println("Ошибка при отправке токена в API Gateway: " + response.getStatusCode());
+    public boolean updateUserFields(String oldUsername, Map<String, String> updatedData, String token) {
+        System.out.println("🔍 Запрос на обновление пользователя: " + oldUsername);
+        System.out.println("🔍 Данные для обновления: " + updatedData);
+        Optional<User> userOptional = userRepository.findByUsername(oldUsername);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            System.out.println("✅ Найден пользователь с username: " + user.getUsername());
+            String newUsername = updatedData.get("username");
+            if (!oldUsername.equals(newUsername)) {
+                System.out.println("🔄 Обновляем username: " + oldUsername + " → " + newUsername);
+                user.setUsername(newUsername);
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority(user.getRole().getAuthority())));
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                System.out.println("✅ SecurityContext обновлен, теперь username: " + newUsername);
             }
-        } catch (Exception e) {
-            System.err.println("Ошибка при отправке токена в API Gateway: " + e.getMessage());
+            user.setFirstname(updatedData.get("firstname"));
+            user.setLastname(updatedData.get("lastname"));
+            user.setEmail(updatedData.get("email"));
+            userRepository.save(user);
+            System.out.println("✅ Данные пользователя успешно обновлены!");
+            return true;
+        } else {
+            System.err.println("❌ Ошибка: Пользователь с username '" + oldUsername + "' не найден.");
+            return false;
         }
     }
 
- }
+    public void sendToken(String username, String token) {
+        System.out.println("Отправка токена: " + token + " для пользователя: " + username);
+        sendTokenToApiGateway(username, token);
+    }
+
+    public void sendTokenToApiGateway(String username, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        if (!token.startsWith("Bearer ")) {
+            token = "Bearer " + token;
+        }
+        headers.set(HttpHeaders.AUTHORIZATION, token);
+        headers.set("username", username);
+        System.out.println("🔄 Заголовки перед отправкой в API Gateway: " + headers);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        try {
+            ResponseEntity<Void> response = restTemplate.postForEntity(GATEWAY_SERVICE_URL, requestEntity, Void.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("✅ Токен успешно отправлен в API Gateway");
+            } else {
+                System.out.println("❌ Ошибка при отправке токена в API Gateway: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка при отправке токена в API Gateway: " + e.getMessage());
+        }
+    }
+}

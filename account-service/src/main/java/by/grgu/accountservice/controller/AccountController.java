@@ -7,10 +7,7 @@ import by.grgu.accountservice.dto.AccountDTO;
 import by.grgu.accountservice.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -71,20 +68,31 @@ public class AccountController {
 
     @GetMapping("/account")
     public String showAccount(@RequestHeader("username") String username, Model model) {
-
         if (username == null || username.isEmpty()) {
             return "redirect:http://localhost:8082/identity/login";
+        }
+
+        System.out.println("🔍 Проверяем username в API Gateway: " + username);
+
+        AccountDTO account = accountService.getAccountData(username);
+
+        // ✅ Если `username` изменился, делаем правильный редирект
+        if (!username.equals(account.getUsername())) {
+            System.out.println("🔄 Username изменился, редирект на новый аккаунт: " + account.getUsername());
+            return "redirect:http://localhost:8082/accounts/" + account.getUsername() + "/account";
         }
 
         String balanceUrl = "http://localhost:8082/accounts/" + username + "/balance";
         ResponseEntity<BigDecimal> response = restTemplate.getForEntity(balanceUrl, BigDecimal.class);
         BigDecimal totalBalance = response.getBody() != null ? response.getBody() : BigDecimal.ZERO;
 
-        model.addAttribute("username", username);
+        model.addAttribute("username", account.getUsername());
         model.addAttribute("totalBalance", totalBalance);
 
         return "account";
     }
+
+
 
     @GetMapping("/exit")
     public String showExitPage() {
@@ -136,17 +144,14 @@ public class AccountController {
     @GetMapping("/information")
     public String showAccountPage(@RequestHeader("username") String username, Model model) {
         AccountDTO account = accountService.getAccountData(username);
+
+        // ✅ Проверяем, передается ли `id`
+        if (account.getId() == null) {
+            System.err.println("❌ Ошибка: `id` аккаунта отсутствует!");
+        }
+
         model.addAttribute("account", account);
-
         return "account_information";
-    }
-
-    @PostMapping("/updateField")
-    @ResponseBody
-    public ResponseEntity<String> updateAccountField(@RequestHeader("username") String username,
-                                                     @RequestBody Map<String, String> updatedData) {
-        accountService.updateAccountFields(username, updatedData);
-        return ResponseEntity.ok("Данные успешно обновлены!");
     }
 
     @GetMapping

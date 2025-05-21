@@ -10,17 +10,21 @@
             background: linear-gradient(to right, #6a11cb, #2575fc); /* Сине-фиолетовый градиент фона */
             color: white; /* Цвет текста на фоне */
         }
+
         .navbar {
             background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
             backdrop-filter: blur(10px); /* Эффект размытия фона */
             border-radius: 10px; /* Закругленные углы панели */
         }
+
         .navbar-toggler {
             border: none; /* Убираем границу */
         }
+
         .navbar-toggler-icon {
             background-color: transparent; /* Прозрачный фон для кнопки */
         }
+
         .navbar-toggler-icon::before,
         .navbar-toggler-icon::after {
             content: '';
@@ -31,33 +35,40 @@
             margin: 5px 0; /* Отступы между полосками */
             transition: all 0.3s; /* Плавный переход */
         }
+
         .nav-link {
             color: #6a11cb; /* Цвет текста ссылок */
             font-weight: bold; /* Жирный шрифт для ссылок */
             padding: 10px 15px; /* Отступы вокруг ссылок */
             transition: color 0.3s; /* Плавный переход цвета */
         }
+
         .nav-link:hover {
             color: #2575fc; /* Цвет текста ссылок при наведении */
         }
+
         .nav-link.active {
             color: #ff4081; /* Цвет активной ссылки (розовый) */
         }
+
         .welcome-text {
             font-size: 2rem; /* Размер шрифта */
             font-weight: 700; /* Жирный шрифт */
             text-align: center; /* Центрирование текста */
             margin-bottom: 20px; /* Отступ снизу */
         }
+
         .card {
             margin-bottom: 20px; /* Отступы между карточками */
             border-radius: 10px; /* Закругленные углы карточек */
             background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон для карточек */
             color: black; /* Черный текст внутри карточек */
         }
+
         .card-title {
             color: #6a11cb; /* Цвет заголовков карточек */
         }
+
         .btn-custom {
             background-color: #ffffff; /* Белый фон */
             color: #6a11cb; /* Синий цвет текста */
@@ -67,11 +78,13 @@
             transition: all 0.3s ease; /* Плавный переход */
             font-weight: bold; /* Жирный шрифт */
         }
+
         .btn-custom:hover {
             background-color: #6a11cb; /* Синий фон при наведении */
             color: white; /* Белый текст при наведении */
             border-color: #6a11cb; /* Синяя граница при наведении */
         }
+
         .btn-custom:focus {
             outline: none; /* Убираем рамку при фокусе */
             box-shadow: 0 0 5px rgba(106, 17, 203, 0.5); /* Тень при фокусе */
@@ -81,7 +94,8 @@
 <body>
 <nav class="navbar navbar-expand-lg">
     <a class="navbar-brand" href="#">Финансовый менеджер</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -111,13 +125,14 @@
         </ul>
     </div>
 </nav>
+
 <div class="container mt-4">
     <h1 class="welcome-text">Генерация отчетов</h1>
 
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Создание отчета</h5>
-            <form id="reportForm" action="/reports/total-expense-report" method="post">
+            <form id="reportForm" action="/reports/create" method="post">
                 <div class="form-group">
                     <label for="reportType">Выберите отчет:</label>
                     <select id="reportType" name="reportType" class="form-control" required>
@@ -125,6 +140,7 @@
                         <option value="monthly-expense">Расходы за месяц</option>
                         <option value="monthly-income">Доходы за месяц</option>
                         <option value="total-report">Общий финансовый отчет</option>
+                        <option value="income-by-source">Доходы по источнику</option> <!-- ✅ Новый отчет -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -143,52 +159,15 @@
                     <input type="number" id="year" name="year" min="2000" max="2100" class="form-control">
                 </div>
 
-                <button type="submit" class="btn btn-custom" onclick="return prepareFormData();">Создать отчет</button>
+                <div id="sourceSelection" class="form-group" style="display: none;"> <!-- ✅ Выбор источника дохода -->
+                    <label for="source">Источник дохода:</label>
+                    <select id="source" name="source" class="form-control">
+                        <!-- Источники дохода будут загружаться динамически через JavaScript -->
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-custom">Создать отчет</button>
             </form>
-
-
-            <script>
-                document.getElementById("reportType").addEventListener("change", function () {
-                    let selectedReport = this.value;
-
-                    // Проверяем, что `selectedReport` НЕ пустой!
-                    if (!selectedReport) return;
-
-                    // Меняем `action` формы на нужный эндпоинт
-                    document.getElementById("reportForm").action = "/reports/" + selectedReport;
-
-                    // Показываем `monthYearSelection` для "monthly" и "total-report"
-                    document.getElementById("monthYearSelection").style.display =
-                        selectedReport.includes("monthly") || selectedReport === "total-report" ? "block" : "none";
-
-                    // Всегда оставляем `POST`
-                    document.getElementById("reportForm").method = "post";
-                });
-
-            </script>
-
-            <script>
-                function prepareFormData() {
-                    let reportType = document.getElementById("reportType").value;
-                    let reportFormat = document.getElementById("reportFormat").value;
-                    let month = document.getElementById("month").value;
-                    let year = document.getElementById("year").value;
-
-                    if (!reportType || !reportFormat) {
-                        alert("Выберите тип отчета и формат!");
-                        return false;
-                    }
-
-                    if (reportType.includes("monthly") && (!month || !year)) {
-                        alert("Выберите месяц и год!");
-                        return false;
-                    }
-
-                    return true;
-                }
-            </script>
-
-
         </div>
     </div>
 
@@ -196,9 +175,44 @@
     <div th:if="${reportMessage}" class="alert alert-info" role="alert">
         <strong th:text="${reportMessage}"></strong>
     </div>
+    <div th:if="${reportPath}" style="margin-top: 20px;">
+        <h3>Ваш отчет:</h3>
+        <a th:href="@{/reports/view(path=${reportPath}, format=${reportFormat})}" class="btn btn-custom">Просмотреть
+            отчет</a>
+    </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById("reportType").addEventListener("change", function () {
+        let selectedReport = this.value;
+
+        // Меняем видимость выбора месяца и года
+        document.getElementById("monthYearSelection").style.display =
+            selectedReport.includes("monthly") || selectedReport === "total-report" || selectedReport === "income-by-source" ? "block" : "none";
+
+        // Показываем список источников, если выбран отчет доходов по источнику
+        document.getElementById("sourceSelection").style.display =
+            selectedReport === "income-by-source" ? "block" : "none";
+
+        if (selectedReport === "income-by-source") {
+            fetch('/api/income-sources') // ✅ Загружаем список источников
+                .then(response => response.json())
+                .then(data => {
+                    let sourceDropdown = document.getElementById("source");
+                    sourceDropdown.innerHTML = "";
+                    data.forEach(source => {
+                        let option = document.createElement("option");
+                        option.value = source;
+                        option.textContent = source;
+                        sourceDropdown.appendChild(option);
+                    });
+                });
+        }
+    });
+</script>
+
 </body>
 </html>

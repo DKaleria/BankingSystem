@@ -35,4 +35,10 @@ public class IncomeApiController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(incomeDTOs);
     }
+
+    @GetMapping("/sources")
+    public ResponseEntity<List<String>> getIncomeSources(@RequestHeader("username") String username) {
+        List<String> sources = incomeService.getIncomeSources(username);
+        return ResponseEntity.ok(sources);
+    }
 }

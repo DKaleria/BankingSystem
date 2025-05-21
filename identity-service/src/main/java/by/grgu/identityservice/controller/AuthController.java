@@ -11,9 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,7 +24,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
+    private final RestTemplate restTemplate;
 
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
@@ -94,24 +96,23 @@ public class AuthController {
         return "redirect:http://localhost:8082/identity/login";
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<Object> getCurrentUser() {
-        try {
-            User currentUser = userService.getCurrentUser();
-            return ResponseEntity.ok(currentUser);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorMessage(new Date(), e.getMessage()));
-        }
-    }
-
     @GetMapping("/validate-token")
     public ResponseEntity<Void> validateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        if (jwtTokenUtil.validateToken(authorization.substring(7))) {  // Убираем "Bearer "
+        try {
+            System.out.println("🔍 Запрос на валидацию токена: " + authorization);
+
+            boolean isValid = jwtTokenUtil.validateToken(authorization.substring(7));  // ✅ Убираем "Bearer "
+
+            if (!isValid) {
+                System.err.println("❌ Токен недействителен, редирект на /identity/login!");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).location(URI.create("/identity/login")).build();
+            }
+
+            System.out.println("✅ Токен подтвержден, доступ разрешен!");
             return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка при проверке токена: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

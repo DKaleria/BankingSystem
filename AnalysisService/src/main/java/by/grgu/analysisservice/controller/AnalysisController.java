@@ -57,5 +57,4 @@ public class AnalysisController {
             return "analysis";
         }
     }
-
 }

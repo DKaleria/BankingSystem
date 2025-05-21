@@ -1,6 +1,7 @@
 package by.grgu.identityservice.utils;
 
 import by.grgu.identityservice.config.JwtConfig;
+import by.grgu.identityservice.service.UserService;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,8 @@ import javax.xml.bind.DatatypeConverter;
 public class JwtTokenUtil {
     private final JwtConfig jwtConfig;
 
+    private UserService userService;
+
     public String generateAccessToken(Authentication authentication) {
         return generateToken(authentication, jwtConfig.accessTokenValidity());
     }
@@ -24,9 +27,19 @@ public class JwtTokenUtil {
     }
 
     private String generateToken(Authentication authentication, Duration validity) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+
+        UserDetails userDetails;
+        if (principal instanceof UserDetails) {
+            userDetails = (UserDetails) principal;
+        } else {
+            System.out.println("🔍 `principal` передан как String, загружаем `UserDetails` вручную.");
+            userDetails = userService.loadUserByUsername(principal.toString()); // ✅ Загружаем `UserDetails`
+        }
+
         return generateToken(userDetails, validity);
     }
+
 
     private String generateToken(UserDetails userDetails, Duration validity) {
         return Jwts.builder()
@@ -36,7 +49,6 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS512, DatatypeConverter.parseBase64Binary(jwtConfig.secret()))
                 .compact();
     }
-
 
     public boolean validateToken(String token) {
         try {

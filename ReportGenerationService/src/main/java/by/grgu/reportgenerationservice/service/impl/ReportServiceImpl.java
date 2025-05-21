@@ -19,17 +19,15 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -73,8 +71,6 @@ public class ReportServiceImpl implements ReportService {
         String url = API_GATEWAY_URL + "incomes/" + username + "/total";
         return restTemplate.getForObject(url, BigDecimal.class);
     }
-
-
     @Override
     public void saveMonthlyReport(String username, int month, int year) {
         BigDecimal totalIncome = getTotalIncomeForMonth(username, month, year);
@@ -124,7 +120,6 @@ public class ReportServiceImpl implements ReportService {
         return incomes;
     }
 
-
     private List<ExpenseDTO> getExpensesForMonth(String username, int month, int year) {
         String url = String.format("%s/api/expenses/monthly?username=%s&month=%d&year=%d",
                 API_GATEWAY_URL, username, month, year);
@@ -151,8 +146,6 @@ public class ReportServiceImpl implements ReportService {
 
         return expenses;
     }
-
-
 
     public MonthlyReportDTO generateMonthlyReport(String username, int month, int year) {
         BigDecimal totalIncome = getTotalIncomeForMonth(username, month, year);
@@ -230,7 +223,6 @@ public class ReportServiceImpl implements ReportService {
         }
         return outputPath;
     }
-
 
     private JRTextExporter createTextExporter(JasperPrint jasperPrint, String outputPath) {
         JRTextExporter exporter = new JRTextExporter();
@@ -344,4 +336,46 @@ public class ReportServiceImpl implements ReportService {
 
         return exportReport(jasperPrint, format, "total_report");
     }
+
+    @Override
+    public List<String> getIncomeSources(String username) {
+        String url = API_GATEWAY_URL + "api/incomes/sources"; // ✅ Запрос через API Gateway
+        return Arrays.asList(restTemplate.getForObject(url, String[].class));
+    }
+
+    @Override
+    public String generateIncomeBySourceReport(
+            String username, String format, int month, int year, String selectedSource)
+            throws JRException, IOException {
+
+        JasperReport jasperReport = JasperCompileManager.compileReport("/home/valeryia/JaspersoftWorkspace/MyReports/income_by_source.jrxml");
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("username", username);
+        parameters.put("month", month);
+        parameters.put("year", year);
+        parameters.put("selectedSource", selectedSource); // ✅ Указанный источник дохода
+
+        // ✅ Запрос данных через API Gateway
+        String url = API_GATEWAY_URL + "incomes/" + username + "?month=" + month + "&year=" + year;
+        List<IncomeDTO> incomes = Arrays.asList(restTemplate.getForObject(url, IncomeDTO[].class));
+
+        // ✅ Фильтруем данные только по `selectedSource`
+        List<Map<String, Object>> filteredData = incomes.stream()
+                .filter(income -> income.getSource().equals(selectedSource))
+                .map(income -> {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("source", income.getSource());
+                    row.put("amount", income.getAmount());
+                    return row;
+                })
+                .collect(Collectors.toList());
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(filteredData);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        // ✅ Экспорт отчета в нужный формат
+        return exportReport(jasperPrint, format, "income_by_source");
+    }
+
 }

@@ -4,6 +4,7 @@ import by.grgu.reportgenerationservice.dto.MonthlyReportDTO;
 import net.sf.jasperreports.engine.JRException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface ReportService {
     BigDecimal getTotalExpenseForMonth(String username, int month, int year);
@@ -20,4 +21,10 @@ public interface ReportService {
             throws JRException, IOException;
     String generateTotalReport(String username, int month, int year, String format)
             throws JRException, IOException;
+
+    String generateIncomeBySourceReport(String username, String format,
+                                        int month, int year, String selectedSource)
+            throws JRException, IOException;
+
+    List<String> getIncomeSources(String username);
 }

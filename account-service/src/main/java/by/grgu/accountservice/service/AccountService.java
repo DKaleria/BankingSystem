@@ -17,11 +17,11 @@ public interface AccountService {
 
     AccountDTO getAccountData(String username);
 
-    void updateAccountFields(String username, Map<String, String> updatedData);
-
     List<AccDto> getAllAccounts();
 
     void updateAccountStatus(String username, Map<String, String> status);
 
     AccDto getTotalAccountData(String username);
-}
+
+    boolean updateAccountFields(Map<String, String> updatedData, String token);
+   }
