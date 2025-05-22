@@ -15,23 +15,22 @@ public class UserAccountController {
         this.accountRepository = accountRepository;
     }
 
-    @PostMapping("/updateField") // ✅ Используем `POST`, как в `IdentityController`
+    @PostMapping("/updateField")
     public ResponseEntity<Map<String, String>> updateAccount(@RequestBody Map<String, String> updatedData) {
         String oldUsername = updatedData.get("oldUsername");
-        String newUsername = updatedData.getOrDefault("username", oldUsername); // ✅ Гарантированно получаем `newUsername`
+        String newUsername = updatedData.getOrDefault("username", oldUsername);
 
         Account account = accountRepository.findByUsername(oldUsername)
-                .orElseThrow(() -> new RuntimeException("❌ Аккаунт не найден: " + oldUsername));
+                .orElseThrow(() -> new RuntimeException("Аккаунт не найден: " + oldUsername));
 
         if (!oldUsername.equals(newUsername)) {
             account.setUsername(newUsername);
         }
 
         accountRepository.save(account);
-        accountRepository.flush(); // ✅ Принудительно фиксируем изменения в БД
+        accountRepository.flush();
 
-        System.out.println("✅ Аккаунт обновлён: " + newUsername);
-        return ResponseEntity.ok(Map.of("status", "success", "message", "✅ Аккаунт обновлён"));
+        return ResponseEntity.ok(Map.of("status", "success", "message", "Аккаунт обновлён"));
     }
 
 }

@@ -30,7 +30,6 @@ public class JwtValidationFilter extends AbstractGatewayFilterFactory<JwtValidat
                     authHeader = fetchedHeaders.get(HttpHeaders.AUTHORIZATION);
                     username = fetchedHeaders.get("username");
                 } else {
-                    System.err.println("Ошибка: API Gateway не вернул заголовки!");
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().setComplete();
                 }
@@ -67,8 +66,6 @@ public class JwtValidationFilter extends AbstractGatewayFilterFactory<JwtValidat
         return null;
     }
 
-
-
     private boolean validateToken(String token) {
         String url = "http://localhost:8088/identity/validate-token";
 
@@ -86,5 +83,4 @@ public class JwtValidationFilter extends AbstractGatewayFilterFactory<JwtValidat
     }
     public static class Config {
     }
-
 }

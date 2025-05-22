@@ -13,5 +13,5 @@ import java.math.BigDecimal;
 public class ExpenseDTO {
     private String username;
     private BigDecimal amount;
-    private String description;  // ✅ Добавляем поле `description`!
+    private String description;
 }

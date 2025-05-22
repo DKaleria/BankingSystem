@@ -15,14 +15,11 @@ public class ApiGatewayController {
     public ResponseEntity<Void> updateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                                             @RequestHeader("username") String username) {
         if (authorizationHeader == null || username == null) {
-            System.err.println("Ошибка: отсутствуют заголовки!");
             return ResponseEntity.badRequest().build();
         }
 
         savedHeaders.set(HttpHeaders.AUTHORIZATION, authorizationHeader);
         savedHeaders.set("username", username);
-
-        System.out.println("savedHeaders: " + savedHeaders.toString());
 
         return ResponseEntity.ok().build();
     }
@@ -30,7 +27,6 @@ public class ApiGatewayController {
     @GetMapping("/get-token")
     public ResponseEntity<Map<String, String>> getToken() {
         if (savedHeaders.isEmpty()) {
-            System.err.println("Ошибка: заголовки не найдены!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -40,5 +36,4 @@ public class ApiGatewayController {
 
         return ResponseEntity.ok(headersMap);
     }
-
 }

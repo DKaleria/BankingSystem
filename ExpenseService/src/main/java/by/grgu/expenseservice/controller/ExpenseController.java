@@ -36,7 +36,6 @@ public class ExpenseController {
 
         List<Expense> expenses;
         if ("monthly".equals(expenseType) && (month == null || year == null)) {
-            System.err.println("Ошибка: месяц и год не указаны!");
             model.addAttribute("errorMessage", "Выберите месяц и год!");
             expenses = new ArrayList<>();
         } else if ("monthly".equals(expenseType)) {
@@ -57,7 +56,6 @@ public class ExpenseController {
                                      @RequestParam(required = false) Integer year,
                                      Model model) {
         if (month == null || year == null) {
-            System.err.println("Ошибка: `month` или `year` не переданы!");
             model.addAttribute("errorMessage", "Выберите месяц и год!");
             return "expense";
         }
@@ -80,7 +78,6 @@ public class ExpenseController {
         try {
             expenseService.createExpense(expense);
         } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка: " + e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             return getUserExpenses(username, model);
         }
@@ -96,9 +93,6 @@ public class ExpenseController {
             System.out.println("У пользователя пока нет расходов, передаем пустой список.");
             expenses = new ArrayList<>();
         }
-
-        System.out.println("username: " + username);
-        System.out.println("expenses: " + expenses);
 
         model.addAttribute("username", username);
         model.addAttribute("expenses", expenses);
@@ -155,5 +149,4 @@ public class ExpenseController {
 
         return expenses;
     }
-
 }

@@ -5,6 +5,5 @@ import java.math.BigDecimal;
 
 public interface RecommendationService {
     RecommendationReport generateRecommendations
-            (String username,
-                                                 int month, int year, BigDecimal desiredExpenses);
+            (String username, int month, int year, BigDecimal desiredExpenses);
 }

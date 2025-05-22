@@ -2,7 +2,6 @@ package by.grgu.identityservice.database.entity;
 
 import by.grgu.identityservice.database.entity.enumm.Role;
 import lombok.*;
-
 import java.time.LocalDate;
 
 @AllArgsConstructor

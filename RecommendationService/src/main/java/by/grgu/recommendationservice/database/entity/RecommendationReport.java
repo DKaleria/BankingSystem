@@ -14,7 +14,9 @@ public class RecommendationReport {
     private BigDecimal remainingBudget;
     private List<String> recommendations;
 
-    public RecommendationReport(BigDecimal totalIncome, BigDecimal totalExpense, BigDecimal desiredExpenses, BigDecimal remainingBudget, List<String> recommendations) {
+    public RecommendationReport(BigDecimal totalIncome,
+                                BigDecimal totalExpense, BigDecimal desiredExpenses,
+                                BigDecimal remainingBudget, List<String> recommendations) {
         this.totalIncome = totalIncome;
         this.totalExpense = totalExpense;
         this.desiredExpenses = desiredExpenses;

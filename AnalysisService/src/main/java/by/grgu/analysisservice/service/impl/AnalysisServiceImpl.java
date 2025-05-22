@@ -30,7 +30,6 @@ public class AnalysisServiceImpl implements AnalysisService {
 
             return totalIncome.subtract(totalExpense);
         } catch (Exception e) {
-            System.err.println("Ошибка в `getTotalBalance`: " + e.getMessage());
             return BigDecimal.ZERO;
         }
     }
@@ -77,7 +76,6 @@ public class AnalysisServiceImpl implements AnalysisService {
             ResponseEntity<BigDecimal> response = restTemplate.getForEntity(url, BigDecimal.class);
             return response.getBody() != null ? response.getBody() : BigDecimal.ZERO;
         } catch (Exception e) {
-            System.err.println("Ошибка при запросе: " + e.getMessage());
             return BigDecimal.ZERO;
         }
     }

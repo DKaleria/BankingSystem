@@ -184,19 +184,19 @@ function saveChanges() {
         lastname: document.getElementById("lastname").value || "",
         email: document.getElementById("email").value || ""
     };
-    console.log("🔄 Отправляем данные в IdentityService:", updatedData);
+    console.log("Отправляем данные в IdentityService:", updatedData);
     fetch("/user-identity/updateField", {
         method: "POST",
         headers: {"Content-Type": "application/json", "username": oldUsername},
         body: JSON.stringify(updatedData)
     }).then(response => response.json()).then(identityData => {
         if (identityData.status !== "success") {
-            console.error("❌ Ошибка обновления в IdentityService:", identityData.message);
+            console.error("Ошибка обновления в IdentityService:", identityData.message);
             return;
         }
-        console.log("✅ Данные обновлены в IdentityService!", identityData);
+        console.log("Данные обновлены в IdentityService!", identityData);
         document.getElementById("usernameDisplay").innerText = newUsername;
-    }).catch(error => console.error("❌ Ошибка обновления данных!", error));
+    }).catch(error => console.error("Ошибка обновления данных!", error));
 } </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

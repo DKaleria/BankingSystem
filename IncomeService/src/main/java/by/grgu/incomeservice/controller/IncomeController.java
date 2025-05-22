@@ -87,8 +87,6 @@ public class IncomeController {
         if (incomes == null || incomes.isEmpty()) {
             incomes = new ArrayList<>();
         }
-        System.out.println("username: "+ username);
-        System.out.println("incomes: "+ incomes);
 
         model.addAttribute("username", username);
         model.addAttribute("incomes", incomes);
@@ -132,7 +130,6 @@ public class IncomeController {
         if (incomes.isEmpty()) {
             System.out.println("У пользователя пока нет доходов, передаем пустой список.");
         }
-
         return incomes;
     }
 }

@@ -2,15 +2,12 @@ package by.grgu.identityservice.controller;
 
 import by.grgu.identityservice.database.entity.RegistrationRequest;
 import by.grgu.identityservice.database.entity.User;
-import by.grgu.identityservice.exceptions.ErrorMessage;
 import by.grgu.identityservice.service.UserService;
 import by.grgu.identityservice.utils.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,11 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -36,11 +30,9 @@ import java.util.List;
 @Transactional
 @RequestMapping("/identity")
 public class AuthController {
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final UserService userService;
-    private final RestTemplate restTemplate;
 
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
@@ -54,8 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute RegistrationRequest request,
-                                           HttpServletResponse response) {
+    public String register(@ModelAttribute RegistrationRequest request) {
         userService.register(request);
 
         return "registration_success";
@@ -71,7 +62,8 @@ public class AuthController {
 
     @SneakyThrows
     @PostMapping("/authenticate")
-    public String authenticate(@RequestParam String username, @RequestParam String password, RedirectAttributes redirectAttributes) {
+    public String authenticate(@RequestParam String username,
+                               @RequestParam String password, RedirectAttributes redirectAttributes) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
@@ -86,7 +78,6 @@ public class AuthController {
                         .findFirst()
                         .orElse("USER");
 
-                // Редирект на полные URL
                 return "ADMIN".equals(role) ? "redirect:http://localhost:8082/admin/users" : "redirect:http://localhost:8082/accounts/account";
             }
         } catch (BadCredentialsException e) {
@@ -99,19 +90,14 @@ public class AuthController {
     @GetMapping("/validate-token")
     public ResponseEntity<Void> validateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         try {
-            System.out.println("🔍 Запрос на валидацию токена: " + authorization);
-
-            boolean isValid = jwtTokenUtil.validateToken(authorization.substring(7));  // ✅ Убираем "Bearer "
+            boolean isValid = jwtTokenUtil.validateToken(authorization.substring(7));
 
             if (!isValid) {
-                System.err.println("❌ Токен недействителен, редирект на /identity/login!");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).location(URI.create("/identity/login")).build();
             }
 
-            System.out.println("✅ Токен подтвержден, доступ разрешен!");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            System.err.println("❌ Ошибка при проверке токена: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -123,8 +109,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("Метод выхода вызывается");
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null) {

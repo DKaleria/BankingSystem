@@ -33,7 +33,8 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         String expenseSourceUrl = API_GATEWAY_URL + "api/expenses/source-breakdown?username=" + username + "&month=" + month + "&year=" + year;
         ResponseEntity<Map<String, BigDecimal>> sourceResponse = restTemplate.exchange(
-                expenseSourceUrl, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, BigDecimal>>() {});
+                expenseSourceUrl, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                });
         Map<String, BigDecimal> sourceExpenses = sourceResponse.getBody();
 
         BigDecimal remainingBudget = totalIncome.subtract(totalExpense);

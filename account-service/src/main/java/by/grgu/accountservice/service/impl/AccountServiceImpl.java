@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -113,19 +112,13 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     public boolean updateAccountFields(Map<String, String> updatedData, String token) {
-        System.out.println("🔄 Полученные данные в AccountService: " + updatedData);
-
         String username = updatedData.get("username");
-
-        System.out.println("🔍 Ищем аккаунт по `username`: " + username);
 
         Optional<Account> accountOptional = accountRepository.findByUsername(username);
 
         if (accountOptional.isPresent()) {
             Account account = accountOptional.get();
-            System.out.println("✅ Найден аккаунт: " + account.getUsername());
 
-            // ✅ Немедленно обновляем `username` в БД, чтобы он был актуальным
             account.setUsername(username);
 
             account.setFirstname(updatedData.get("firstname"));
@@ -133,20 +126,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             account.setEmail(updatedData.get("email"));
 
             accountRepository.save(account);
-            System.out.println("✅ Аккаунт успешно обновлен!");
-
             return true;
         } else {
-            System.err.println("❌ Ошибка: Аккаунт с username '" + username + "' не найден.");
+            System.err.println("Ошибка: Аккаунт с username '" + username + "' не найден.");
             return false;
         }
-    }
-
-
-    private HttpHeaders createHeaders(String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token); // ✅ Устанавливаем токен
-        return headers;
     }
 
     public List<AccDto> getAllAccounts() {

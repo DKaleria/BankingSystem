@@ -141,7 +141,7 @@
                         <option value="monthly-income">Доходы за месяц</option>
                         <option value="total-report">Общий финансовый отчет</option>
                         <option value="income-by-source">Доходы по источнику</option>
-                        <option value="expense-by-description">Расходы по описанию</option> <!-- ✅ Новый отчет -->
+                        <option value="expense-by-description">Расходы по описанию</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -221,7 +221,7 @@
                     sourceDropdown.appendChild(option);
                 });
             })
-            .catch(error => console.error("❌ Ошибка загрузки источников доходов:", error));
+            .catch(error => console.error("Ошибка загрузки источников доходов:", error));
     }
 
     function updateExpenseDescriptions() {
@@ -236,9 +236,9 @@
                     option.textContent = description;
                     descriptionDropdown.appendChild(option);
                 });
-                console.log("✅ Загруженные категории расходов:", data);
+                console.log("Загруженные категории расходов:", data);
             })
-            .catch(error => console.error("❌ Ошибка загрузки описаний расходов:", error));
+            .catch(error => console.error("Ошибка загрузки описаний расходов:", error));
     }
 
 

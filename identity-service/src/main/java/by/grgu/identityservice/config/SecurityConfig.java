@@ -22,8 +22,6 @@ public class SecurityConfig {
             "/identity/validate-token"
     };
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(CsrfConfigurer::disable)
@@ -42,7 +40,6 @@ public class SecurityConfig {
                                     .findFirst()
                                     .orElse("USER");
 
-                            // Полные пути для редиректа
                             if ("ADMIN".equals(role)) {
                                 response.sendRedirect("http://localhost:8082/admin/users");
                             } else {

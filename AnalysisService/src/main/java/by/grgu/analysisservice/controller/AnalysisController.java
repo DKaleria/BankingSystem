@@ -52,7 +52,6 @@ public class AnalysisController {
 
             return "analysis";
         } catch (Exception e) {
-            System.err.println("Ошибка в `getAnalysisData`: " + e.getMessage());
             model.addAttribute("errorMessage", "Ошибка при загрузке данных: " + e.getMessage());
             return "analysis";
         }

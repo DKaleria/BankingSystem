@@ -33,8 +33,7 @@ public class JwtTokenUtil {
         if (principal instanceof UserDetails) {
             userDetails = (UserDetails) principal;
         } else {
-            System.out.println("🔍 `principal` передан как String, загружаем `UserDetails` вручную.");
-            userDetails = userService.loadUserByUsername(principal.toString()); // ✅ Загружаем `UserDetails`
+            userDetails = userService.loadUserByUsername(principal.toString());
         }
 
         return generateToken(userDetails, validity);
@@ -57,7 +56,7 @@ public class JwtTokenUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
-            return claims.getExpiration().after(new Date());  // Проверяем, не истек ли срок
+            return claims.getExpiration().after(new Date());
         } catch (ExpiredJwtException e) {
             System.out.println("Ошибка: токен истек!");
             return false;
@@ -66,7 +65,6 @@ public class JwtTokenUtil {
             return false;
         }
     }
-
 
     public String getUsernameFromToken(String token) {
         try {
@@ -79,6 +77,5 @@ public class JwtTokenUtil {
             return null;
         }
     }
-
 
 }

@@ -108,7 +108,8 @@ public class ReportServiceImpl implements ReportService {
                 url,
                 HttpMethod.GET,
                 entity,
-                new ParameterizedTypeReference<List<IncomeDTO>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
 
         List<IncomeDTO> incomes = responseEntity.getBody();
@@ -135,7 +136,8 @@ public class ReportServiceImpl implements ReportService {
                 url,
                 HttpMethod.GET,
                 entity,
-                new ParameterizedTypeReference<List<ExpenseDTO>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
 
         List<ExpenseDTO> expenses = responseEntity.getBody();
@@ -212,10 +214,10 @@ public class ReportServiceImpl implements ReportService {
                 ImageIO.write(bufferedImage, "png", new File(outputPath));
                 break;
             case "text":
-                String textOutputPath = outputPath.replace(".text", ".txt");  // ✅ Используем `.txt`, чтобы избежать белого экрана
+                String textOutputPath = outputPath.replace(".text", ".txt");
 
                 if (jasperPrint.getPages().isEmpty()) {
-                    throw new RuntimeException("❌ Ошибка: В отчёте нет данных!");
+                    throw new RuntimeException("Ошибка: В отчёте нет данных!");
                 }
 
                 JRTextExporter textExporter = new JRTextExporter();
@@ -230,9 +232,8 @@ public class ReportServiceImpl implements ReportService {
 
                 textExporter.exportReport();
 
-                // ✅ Проверяем, записан ли текст в файл
                 if (Files.size(Paths.get(textOutputPath)) == 0) {
-                    throw new RuntimeException("❌ Ошибка: Файл отчёта пуст!");
+                    throw new RuntimeException("Ошибка: Файл отчёта пуст!");
                 }
 
                 return textOutputPath;
@@ -346,7 +347,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<String> getIncomeSources(String username) {
-        String url = API_GATEWAY_URL + "api/incomes/sources"; // ✅ Запрос через API Gateway
+        String url = API_GATEWAY_URL + "api/incomes/sources";
         return Arrays.asList(restTemplate.getForObject(url, String[].class));
     }
 
@@ -363,7 +364,6 @@ public class ReportServiceImpl implements ReportService {
         parameters.put("year", year);
         parameters.put("selectedSource", selectedSource);
 
-        // ✅ Запрос данных через API Gateway
         String url = API_GATEWAY_URL + "/api/incomes/monthly/source?source=" + selectedSource + "&month=" + month + "&year=" + year;
         HttpHeaders headers = new HttpHeaders();
         headers.set("username", username);
@@ -372,12 +372,10 @@ public class ReportServiceImpl implements ReportService {
         ResponseEntity<IncomeDTO[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, IncomeDTO[].class);
         List<IncomeDTO> incomes = Arrays.asList(response.getBody());
 
-        // ✅ Проверяем, есть ли данные
         if (incomes.isEmpty()) {
-            throw new RuntimeException("❌ Ошибка: Нет данных для отчета!");
+            throw new RuntimeException("Ошибка: Нет данных для отчета!");
         }
 
-        // ✅ Формируем список данных для отчета
         List<Map<String, Object>> filteredData = incomes.stream()
                 .map(income -> {
                     Map<String, Object> row = new HashMap<>();
@@ -387,16 +385,13 @@ public class ReportServiceImpl implements ReportService {
                 })
                 .collect(Collectors.toList());
 
-        // ✅ Вычисляем итоговую сумму доходов по источнику
         BigDecimal totalIncomeBySource = filteredData.stream()
                 .map(row -> (BigDecimal) row.get("amount"))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        parameters.put("totalIncomeBySource", totalIncomeBySource); // ✅ Передаем итоговую сумму в отчет
+        parameters.put("totalIncomeBySource", totalIncomeBySource);
 
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(filteredData);
-
-        System.out.println("🔍 Проверяем `totalIncomeBySource`: " + totalIncomeBySource);
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
@@ -416,7 +411,6 @@ public class ReportServiceImpl implements ReportService {
         parameters.put("year", year);
         parameters.put("description", description);
 
-        // ✅ Запрос данных через API Gateway
         String url = API_GATEWAY_URL + "/api/expenses/monthly?month=" + month + "&year=" + year;
         HttpHeaders headers = new HttpHeaders();
         headers.set("username", username);
@@ -425,14 +419,12 @@ public class ReportServiceImpl implements ReportService {
         ResponseEntity<ExpenseDTO[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, ExpenseDTO[].class);
         List<ExpenseDTO> expenses = Arrays.asList(response.getBody());
 
-        // ✅ Проверяем, есть ли данные
         if (expenses.isEmpty()) {
-            throw new RuntimeException("❌ Ошибка: Нет данных для отчета!");
+            throw new RuntimeException("Ошибка: Нет данных для отчета!");
         }
 
-        // ✅ Формируем список данных для отчета (используем `description`)
         List<Map<String, Object>> filteredData = expenses.stream()
-                .filter(expense -> expense.getDescription().equals(description)) // ✅ Фильтрация по `description`
+                .filter(expense -> expense.getDescription().equals(description))
                 .map(expense -> {
                     Map<String, Object> row = new HashMap<>();
                     row.put("description", expense.getDescription());
@@ -441,16 +433,13 @@ public class ReportServiceImpl implements ReportService {
                 })
                 .collect(Collectors.toList());
 
-        // ✅ Вычисляем итоговую сумму расходов по описанию
         BigDecimal totalExpenseByDescription = filteredData.stream()
                 .map(row -> (BigDecimal) row.get("amount"))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        parameters.put("totalExpenseByDescription", totalExpenseByDescription); // ✅ Передаем итоговую сумму в отчет
+        parameters.put("totalExpenseByDescription", totalExpenseByDescription);
 
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(filteredData);
-
-        System.out.println("🔍 Проверяем `totalExpenseByDescription`: " + totalExpenseByDescription);
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 

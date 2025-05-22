@@ -72,13 +72,9 @@ public class AccountController {
             return "redirect:http://localhost:8082/identity/login";
         }
 
-        System.out.println("🔍 Проверяем username в API Gateway: " + username);
-
         AccountDTO account = accountService.getAccountData(username);
 
-        // ✅ Если `username` изменился, делаем правильный редирект
         if (!username.equals(account.getUsername())) {
-            System.out.println("🔄 Username изменился, редирект на новый аккаунт: " + account.getUsername());
             return "redirect:http://localhost:8082/accounts/" + account.getUsername() + "/account";
         }
 
@@ -91,8 +87,6 @@ public class AccountController {
 
         return "account";
     }
-
-
 
     @GetMapping("/exit")
     public String showExitPage() {
@@ -145,9 +139,8 @@ public class AccountController {
     public String showAccountPage(@RequestHeader("username") String username, Model model) {
         AccountDTO account = accountService.getAccountData(username);
 
-        // ✅ Проверяем, передается ли `id`
         if (account.getId() == null) {
-            System.err.println("❌ Ошибка: `id` аккаунта отсутствует!");
+            System.err.println("Ошибка: `id` аккаунта отсутствует!");
         }
 
         model.addAttribute("account", account);

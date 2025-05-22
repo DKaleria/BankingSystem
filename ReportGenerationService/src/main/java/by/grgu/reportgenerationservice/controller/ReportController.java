@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -41,7 +40,6 @@ public class ReportController {
         model.addAttribute("totalExpense", totalExpense);
         model.addAttribute("totalIncome", totalIncome);
 
-        System.out.println("Model: " + model);
         return "report";
     }
 
@@ -64,7 +62,6 @@ public class ReportController {
 
     @GetMapping("/income-sources")
     public ResponseEntity<List<String>> getIncomeSources(@RequestHeader("username") String username) {
-        // ✅ Теперь вызываем метод `getIncomeSources()` из `ReportService`, а не `restTemplate`
         List<String> sources = reportService.getIncomeSources(username);
         return ResponseEntity.ok(sources);
     }
@@ -166,7 +163,6 @@ public class ReportController {
         String reportFormat = params.get("reportFormat");
 
         try {
-            // Проверка на наличие параметра reportFormat
             if (reportFormat == null || reportFormat.isEmpty()) {
                 model.addAttribute("reportMessage", "❌ Формат отчета не указан.");
                 return "report";
@@ -175,7 +171,6 @@ public class ReportController {
             String outputPath = reportService.generateTotalExpenseReport(username, reportFormat);
             model.addAttribute("reportMessage", "✅ Отчет успешно создан: " + outputPath);
         } catch (JRException e) {
-            System.err.println("Ошибка генерации отчета: " + e.getMessage());
             model.addAttribute("reportMessage", "Ошибка при создании отчета.");
         }
 
@@ -210,16 +205,16 @@ public class ReportController {
                     year = Integer.parseInt(params.get("year"));
                     outputPath = reportService.generateTotalReport(username, month, year, reportFormat);
                     break;
-                case "income-by-source": // ✅ Теперь поддерживается "Доходы по источнику"
+                case "income-by-source":
                     month = Integer.parseInt(params.get("month"));
                     year = Integer.parseInt(params.get("year"));
-                    String source = params.get("source"); // ✅ Добавляем источник
+                    String source = params.get("source");
                     outputPath = reportService.generateIncomeBySourceReport(username, reportFormat, month, year, source);
                     break;
-                case "expense-by-description": // ✅ Теперь поддерживается "Расходы по описанию"
+                case "expense-by-description":
                     month = Integer.parseInt(params.get("month"));
                     year = Integer.parseInt(params.get("year"));
-                    String description = params.get("description"); // ✅ Извлекаем описание расхода
+                    String description = params.get("description");
                     outputPath = reportService.generateExpenseByDescriptionReport(username, reportFormat, month, year, description);
                     break;
                 default:
@@ -277,7 +272,7 @@ public class ReportController {
                     mediaType = MediaType.TEXT_PLAIN;
                     return ResponseEntity.ok()
                             .contentType(mediaType)
-                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName()) // ✅ Файл будет скачиваться
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())
                             .body(resource);
                 case "png":
                     mediaType = MediaType.IMAGE_PNG;
@@ -305,13 +300,13 @@ public class ReportController {
         try {
             String outputPath = reportService.generateMonthlyIncomeReport(username, month, year, reportFormat);
             model.addAttribute("reportMessage", "✅ Отчет по доходам за месяц успешно создан.");
-            model.addAttribute("reportPath", outputPath); // Добавляем путь к отчету
+            model.addAttribute("reportPath", outputPath);
         } catch (IOException | JRException e) {
             System.err.println("Ошибка генерации отчета: " + e.getMessage());
             model.addAttribute("reportMessage", "❌ Ошибка при создании отчета.");
         }
 
-        return "report"; // Убедитесь, что это имя вашего шаблона
+        return "report";
     }
 
     @PostMapping("/total-report")
@@ -322,7 +317,6 @@ public class ReportController {
         String monthStr = params.get("month");
         String yearStr = params.get("year");
 
-        // Проверка на пустые значения
         if (monthStr == null || monthStr.isEmpty() || yearStr == null || yearStr.isEmpty()) {
             model.addAttribute("errorMessage", "❌ Месяц и год должны быть указаны.");
             return "report";

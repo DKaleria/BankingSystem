@@ -3,7 +3,6 @@ package by.grgu.expenseservice.controller;
 import by.grgu.expenseservice.database.entity.Expense;
 import by.grgu.expenseservice.dto.ExpenseDTO;
 import by.grgu.expenseservice.service.ExpenseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,11 @@ import java.util.Map;
 @RequestMapping("/api/expenses")
 public class ExpenseApiController {
 
-    @Autowired
-    private ExpenseService expenseService;
+    private final ExpenseService expenseService;
+
+    public ExpenseApiController(ExpenseService expenseService) {
+        this.expenseService = expenseService;
+    }
 
     @GetMapping("/monthly")
     public ResponseEntity<List<ExpenseDTO>> getMonthlyExpensesApi(@RequestHeader("username") String username,
@@ -68,7 +70,6 @@ public class ExpenseApiController {
         List<String> descriptions = expenseService.getExpenseDescriptions(username);
         return ResponseEntity.ok(descriptions);
     }
-
 }
 
 

@@ -26,12 +26,10 @@ public interface AuthUserMapper {
     }
 
     default String encodePassword(String password, PasswordEncoder passwordEncoder) {
-        System.out.println("Original password: " + password);
         if (password == null || password.isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
         String encodedPassword = passwordEncoder.encode(password);
-        System.out.println("Encoded password: " + encodedPassword);
         return encodedPassword;
     }
 }

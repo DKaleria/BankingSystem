@@ -7,9 +7,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
 import java.util.Map;
 
@@ -52,5 +50,4 @@ public class AdminServiceImpl implements AdminService {
         String url = API_GATEWAY_URL + "accounts/" + username + "/data";
         return restTemplate.getForObject(url, AccountDTO.class);
     }
-
 }

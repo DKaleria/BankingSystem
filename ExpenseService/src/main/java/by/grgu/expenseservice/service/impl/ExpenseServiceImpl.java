@@ -45,7 +45,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         BigDecimal projectedBalance = totalIncome.subtract(totalExpense.add(BigDecimal.valueOf(expense.getAmount())));
 
         if (projectedBalance.compareTo(BigDecimal.ZERO) < 0) {
-            System.err.println("Ошибка: Расход превышает допустимый лимит!");
             throw new IllegalArgumentException("Ошибка: Ваш расход превышает доступный баланс!");
         }
 
@@ -92,5 +91,4 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         return expenseRepository.getExpenseByDescriptionForMonth(username, description, startDate, endDate);
     }
-
 }

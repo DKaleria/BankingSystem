@@ -38,7 +38,8 @@ public class RecommendationController {
                                      @RequestParam BigDecimal desiredExpenses,
                                      Model model) {
 
-        RecommendationReport report = recommendationService.generateRecommendations(username, month, year, desiredExpenses);
+        RecommendationReport report = recommendationService.generateRecommendations(
+                username, month, year, desiredExpenses);
 
         model.addAttribute("totalIncome", report.getTotalIncome());
         model.addAttribute("totalExpense", report.getTotalExpense());

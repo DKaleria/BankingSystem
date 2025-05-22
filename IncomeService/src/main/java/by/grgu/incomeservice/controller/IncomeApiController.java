@@ -24,7 +24,6 @@ public class IncomeApiController {
 
         List<Income> incomes = incomeService.getIncomesForMonth(username, month, year);
 
-
         List<IncomeDTO> incomeDTOs = incomes.stream()
                 .map(income -> new IncomeDTO(income.getUsername(),
                         BigDecimal.valueOf(income.getAmount()),
@@ -40,7 +39,6 @@ public class IncomeApiController {
     public ResponseEntity<List<String>> getIncomeSources(@RequestHeader("username") String username) {
         List<String> sources = incomeService.getIncomeSources(username);
 
-        System.out.println("✅ Источники дохода: " + sources); // ✅ Проверяем, что данные загружаются
         return ResponseEntity.ok(sources);
     }
 
@@ -62,7 +60,4 @@ public class IncomeApiController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(incomeDTOs);
     }
-
-
-
 }

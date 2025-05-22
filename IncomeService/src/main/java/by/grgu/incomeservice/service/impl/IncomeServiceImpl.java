@@ -15,7 +15,7 @@ import java.util.List;
 public class IncomeServiceImpl implements IncomeService {
 
     private final IncomeRepository incomeRepository;
-    private final RestTemplate restTemplate; // ✅ Добавляем RestTemplate
+    private final RestTemplate restTemplate;
 
     @Autowired
     public IncomeServiceImpl(IncomeRepository incomeRepository, RestTemplate restTemplate) {
@@ -34,7 +34,7 @@ public class IncomeServiceImpl implements IncomeService {
         ResponseEntity<LocalDate> response = restTemplate.getForEntity(birthDateUrl, LocalDate.class);
 
         if (response.getStatusCode().isError() || response.getBody() == null) {
-            throw new IllegalArgumentException("❌ Ошибка: Не удалось получить дату рождения!");
+            throw new IllegalArgumentException("Ошибка: Не удалось получить дату рождения!");
         }
 
         LocalDate birthDate = response.getBody();
