@@ -37,7 +37,7 @@ public class ReportServiceImpl implements ReportService {
     private final RestTemplate restTemplate;
     private final MonthlyReportRepository monthlyReportRepository;
     private final TotalReportRepository totalReportRepository;
-    private static final String API_GATEWAY_URL = "http://localhost:8082/";
+    private static final String API_GATEWAY_URL = "http://api-gateway/";
 
     @Autowired
     public ReportServiceImpl(RestTemplate restTemplate,

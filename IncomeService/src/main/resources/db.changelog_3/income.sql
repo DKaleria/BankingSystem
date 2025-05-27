@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset Valeriya:07-03-2025-created-author-tbl runOnChange:false
 
-CREATE TABLE incomes (
+CREATE TABLE IF NOT EXISTS incomes (
                          id SERIAL PRIMARY KEY,
                          username VARCHAR(100) NOT NULL,
                          amount DECIMAL NOT NULL,

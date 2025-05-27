@@ -22,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @AllArgsConstructor
@@ -62,12 +64,13 @@ public class AuthController {
 
     @SneakyThrows
     @PostMapping("/authenticate")
-    public String authenticate(@RequestParam String username,
-                               @RequestParam String password, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<?> authenticate(@RequestParam String username,
+                                          @RequestParam String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("Аутентификация успешна? " + authentication.isAuthenticated());
 
             if (authentication.isAuthenticated()) {
                 String accessToken = jwtTokenUtil.generateAccessToken(authentication);
@@ -78,13 +81,17 @@ public class AuthController {
                         .findFirst()
                         .orElse("USER");
 
-                return "ADMIN".equals(role) ? "redirect:http://localhost:8082/admin/users" : "redirect:http://localhost:8082/accounts/account";
+                String redirectUrl = "ADMIN".equals(role) ? "/admin/users" : "/accounts/account";
+                String fullRedirectUrl = "http://api-gateway" + redirectUrl;
+                return ResponseEntity.ok(Map.of("token", accessToken, "redirect", fullRedirectUrl));
             }
         } catch (BadCredentialsException e) {
-            redirectAttributes.addFlashAttribute("error", "Неверное имя пользователя или пароль.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Неверное имя пользователя или пароль."));
         }
 
-        return "redirect:http://localhost:8082/identity/login";
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Ошибка аутентификации"));
     }
 
     @GetMapping("/validate-token")

@@ -8,5 +8,5 @@ RUN mvn package -DskipTests
 #Run stage
 FROM openjdk:17-alpine
 ARG JAR_FILE=/build/target/*.jar
-COPY --from=build $JAR_FILE /opt/identity-service/identity-service.jar
-ENTRYPOINT ["java", "-jar", "/opt/identity-service/identity-service.jar"]
+COPY --from=build $JAR_FILE /opt/expenseservice/expenseservice.jar
+ENTRYPOINT ["java", "-jar", "/opt/expenseservice/expenseservice.jar"]

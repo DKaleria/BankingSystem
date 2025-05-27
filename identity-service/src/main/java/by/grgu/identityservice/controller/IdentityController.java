@@ -44,7 +44,7 @@ public class IdentityController {
 
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(updatedData, headers);
         ResponseEntity<Map> accountResponse = restTemplate.exchange(
-                "http://localhost:8082/user-accounts/updateField",
+                "/user-accounts/updateField",
                 HttpMethod.POST,
                 requestEntity,
                 Map.class

@@ -34,11 +34,11 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense createExpense(Expense expense) {
-        String totalIncomeUrl = "http://localhost:8082/incomes/" + expense.getUsername() + "/total";
+        String totalIncomeUrl = "/incomes/" + expense.getUsername() + "/total";
         ResponseEntity<BigDecimal> incomeResponse = restTemplate.getForEntity(totalIncomeUrl, BigDecimal.class);
         BigDecimal totalIncome = (incomeResponse.getBody() != null) ? incomeResponse.getBody() : BigDecimal.ZERO;
 
-        String totalExpenseUrl = "http://localhost:8082/expenses/" + expense.getUsername() + "/total";
+        String totalExpenseUrl = "http://api-gateway/expenses/" + expense.getUsername() + "/total";
         ResponseEntity<BigDecimal> expenseResponse = restTemplate.getForEntity(totalExpenseUrl, BigDecimal.class);
         BigDecimal totalExpense = (expenseResponse.getBody() != null) ? expenseResponse.getBody() : BigDecimal.ZERO;
 

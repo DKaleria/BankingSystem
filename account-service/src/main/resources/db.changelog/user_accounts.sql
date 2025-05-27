@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset Valeriya:03-12-2024-created-author-tbl runOnChange:false
 
-CREATE TABLE accounts (
+CREATE TABLE IF NOT EXISTS accounts (
                           id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                           username VARCHAR(20) UNIQUE NOT NULL,
                           firstname VARCHAR(20),

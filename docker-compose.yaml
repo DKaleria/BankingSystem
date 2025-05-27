@@ -21,6 +21,39 @@ services:
     ports:
       - "5431:5432"
 
+  expense_db:
+    container_name: expense_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: expense_db
+    ports:
+      - "5434:5432"
+
+  income_db:
+    container_name: income_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: income_db
+    ports:
+      - "5435:5432"
+
+  report_db:
+    container_name: report_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: report_db
+    ports:
+      - "5436:5432"
+
   discoveryservice:
     image: dockerfile-discoveryservice:0.0.1
     ports:
@@ -54,13 +87,55 @@ services:
     depends_on:
       - account_db
       - discoveryservice
+      - api-gateway
 
   income-service:
     image: dockerfile-incomeservice:0.0.1
     ports:
       - "8070:8070"
     depends_on:
-      - identity_db
-      - account_db
+      - income_db
       - discoveryservice
+      - api-gateway
 
+  expense-service:
+    image: dockerfile-expenseservice:0.0.1
+    ports:
+      - "8071:8071"
+    depends_on:
+      - expense_db
+      - discoveryservice
+      - api-gateway
+
+  analysis-service:
+    image: dockerfile-analysisservice:0.0.1
+    ports:
+      - "8091:8091"
+    depends_on:
+      - discoveryservice
+      - api-gateway
+
+  report-generation-service:
+    image: dockerfile-reportgenerationservice:0.0.1
+    ports:
+      - "8073:8073"
+    depends_on:
+      - report_db
+      - discoveryservice
+      - api-gateway
+
+  recommendation-service:
+    image: dockerfile-recommendationservice:0.0.1
+    ports:
+      - "8077:8077"
+    depends_on:
+      - discoveryservice
+      - api-gateway
+
+  admin-service:
+    image: dockerfile-adminservice:0.0.1
+    ports:
+      - "8100:8100"
+    depends_on:
+      - discoveryservice
+      - api-gateway

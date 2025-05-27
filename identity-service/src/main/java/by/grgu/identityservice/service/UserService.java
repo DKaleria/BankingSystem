@@ -34,8 +34,8 @@ public class UserService implements UserDetailsService {
     private final AuthUserMapper authUserMapper;
     private final JwtTokenUtil jwtTokenUtil;
     private final RestTemplate restTemplate;
-    private final String ACCOUNT_SERVICE_URL = "http://localhost:8099/accounts";
-    private final String GATEWAY_SERVICE_URL = "http://localhost:8082/gateway/update-token";
+    private final String ACCOUNT_SERVICE_URL = "http://172.18.0.14:8099/accounts";
+    private final String GATEWAY_SERVICE_URL = "http://api-gateway/gateway/update-token";
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,

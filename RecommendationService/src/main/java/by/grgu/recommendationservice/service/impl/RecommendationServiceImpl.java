@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
 
-    private static final String API_GATEWAY_URL = "http://localhost:8082/";
+    private static final String API_GATEWAY_URL = "http://api-gateway/";
     private RestTemplate restTemplate;
 
     @Autowired

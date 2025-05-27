@@ -4,8 +4,8 @@ spring:
   profiles:
     active: database
   datasource:
-    # url: jdbc:postgresql://identity_db:5432/identity_db
-    url: jdbc:postgresql://localhost:5432/identity_db
+    url: jdbc:postgresql://identity_db:5432/identity_db
+    # url: jdbc:postgresql://localhost:5432/identity_db
     username: my_user
     password: 12345
   jpa:
@@ -23,9 +23,9 @@ spring:
     change-log: db.changelog_2/main-changelog_2.xml
   mvc:
     cors:
-      allowed-origins: "http://localhost:8082"
+      allowed-origins: "http://api-gateway:8082"
       allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
-      allowed-headers: "Authorization,Content-Type,username"  # ✅ Добавляем `username`
+      allowed-headers: "Authorization,Content-Type,username"
 # kafka:
 #   producer:
 #     bootstrap-servers: localhost:9092, localhost:9094
@@ -45,7 +45,7 @@ eureka:
   client:
     registryFetchIntervalSeconds: 10
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://discoveryservice:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 

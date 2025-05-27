@@ -1,4 +1,4 @@
-CREATE TABLE expenses (
+CREATE TABLE IF NOT EXISTS expenses (
                           id SERIAL PRIMARY KEY,
                           date DATE NOT NULL,
                           amount DOUBLE PRECISION NOT NULL,

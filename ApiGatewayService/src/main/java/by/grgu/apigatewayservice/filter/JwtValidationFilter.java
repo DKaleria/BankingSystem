@@ -52,7 +52,7 @@ public class JwtValidationFilter extends AbstractGatewayFilterFactory<JwtValidat
     }
 
     private Map<String, String> fetchHeadersFromApiGateway() {
-        String url = "http://localhost:8082/gateway/get-token";
+        String url = "http://api-gateway/gateway/get-token";
 
         try {
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
@@ -67,7 +67,7 @@ public class JwtValidationFilter extends AbstractGatewayFilterFactory<JwtValidat
     }
 
     private boolean validateToken(String token) {
-        String url = "http://localhost:8088/identity/validate-token";
+        String url = "http://identity-service/identity/validate-token";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);

@@ -4,7 +4,7 @@ spring:
   profiles:
     active: database
   datasource:
-    url: jdbc:postgresql://localhost:5432/report_db
+    url: jdbc:postgresql://report_db:5432/report_db
     username: my_user
     password: 12345
   jpa:
@@ -28,6 +28,6 @@ eureka:
   client:
     registryFetchIntervalSeconds: 10
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://discoveryservice:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
