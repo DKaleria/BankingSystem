@@ -120,7 +120,7 @@
                 <a class="nav-link" href="http://api-gateway/reports/generate">Генерация отчетов</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/accounts/exit">Выйти</a>
+                <a class="nav-link" href="http://api-gateway/accounts/exit">Выйти</a>
             </li>
         </ul>
     </div>
@@ -132,7 +132,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Создание отчета</h5>
-            <form id="reportForm" action="/reports/create" method="post">
+            <form id="reportForm" action="http://api-gateway/reports/create" method="post">
                 <div class="form-group">
                     <label for="reportType">Выберите отчет:</label>
                     <select id="reportType" name="reportType" class="form-control" required>
@@ -160,7 +160,7 @@
                     <input type="number" id="year" name="year" min="2000" max="2100" class="form-control">
                 </div>
 
-                <div id="sourceSelection" class="form-group" style="display: none;"> <!-- ✅ Выбор источника дохода -->
+                <div id="sourceSelection" class="form-group" style="display: none;">
                     <label for="source">Источник дохода:</label>
                     <select id="source" name="source" class="form-control"></select>
                 </div>
@@ -182,8 +182,8 @@
     </div>
     <div th:if="${reportPath}" style="margin-top: 20px;">
         <h3>Ваш отчет:</h3>
-        <a id="viewButton" th:href="@{/reports/view(path=${reportPath}, format=${reportFormat})}" class="btn btn-custom">Просмотреть отчет</a>
-        <a id="downloadButton" th:href="@{/reports/view(path=${reportPath}, format=${reportFormat})}" download class="btn btn-custom" style="display: none;">Скачать отчет</a>
+        <a id="viewButton" th:href="@{http://api-gateway/reports/view(path=${reportPath}, format=${reportFormat})}" class="btn btn-custom">Просмотреть отчет</a>
+        <a id="downloadButton" th:href="@{http://api-gateway/reports/view(path=${reportPath}, format=${reportFormat})}" download class="btn btn-custom" style="display: none;">Скачать отчет</a>
     </div>
 </div>
 
@@ -209,7 +209,7 @@
     });
 
     function updateIncomeSources() {
-        fetch('/api/incomes/sources')
+        fetch('http://api-gateway/api/incomes/sources')
             .then(response => response.json())
             .then(data => {
                 let sourceDropdown = document.getElementById("source");
@@ -225,7 +225,7 @@
     }
 
     function updateExpenseDescriptions() {
-        fetch('/api/expenses/descriptions')
+        fetch('http://api-gateway/api/expenses/descriptions')
             .then(response => response.json())
             .then(data => {
                 let descriptionDropdown = document.getElementById("description");

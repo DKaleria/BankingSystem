@@ -99,7 +99,7 @@
         <strong th:text="${errorMessage}"></strong>
     </div>
 
-    <form th:action="@{/incomes/monthly}" method="get" class="mb-4">
+    <form th:action="@{http://api-gateway/incomes/monthly}" method="get" class="mb-4">
         <div class="form-row align-items-center">
             <div class="col-auto">
                 <label for="month">Месяц</label>
@@ -134,7 +134,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Добавить доход</h5>
-                    <form th:action="@{/incomes/add-income}" method="post">
+                    <form th:action="@{http://api-gateway/incomes/add-income}" method="post">
                         <div class="form-group">
                             <label for="incomeDate">Дата</label>
                             <input type="date" class="form-control" id="incomeDate" name="date" required>
@@ -159,7 +159,7 @@
         </div>
 
         <div class="mb-4">
-            <form th:action="@{/incomes/user-incomes}" method="get">
+            <form th:action="@{http://api-gateway/incomes/user-incomes}" method="get">
                 <button type="submit" class="btn btn-custom">Посмотреть все доходы</button>
             </form>
         </div>
