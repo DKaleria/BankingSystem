@@ -142,5 +142,19 @@
             return false;
         }
 
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            errorMessageElem.innerText = 'Неверный формат электронной почты';
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('registrationForm').addEventListener('submit', validateForm);
+    });
+</script>
+
 </body>
 </html>
