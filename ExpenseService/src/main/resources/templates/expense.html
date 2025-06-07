@@ -111,7 +111,7 @@
         <strong th:text="${errorMessage}"></strong>
     </div>
 
-    <form th:action="@{http://api-gateway/expenses/monthly}" method="get" class="mb-4">
+    <form th:action="@{/expenses/monthly}" method="get" class="mb-4">
         <div class="form-row align-items-center">
             <div class="col-auto">
                 <label for="month">Месяц</label>
@@ -146,7 +146,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Добавить расход</h5>
-                    <form th:action="@{http://api-gateway/expenses/add-expense}" method="post">
+                    <form th:action="@{/expenses/add-expense}" method="post">
                         <div class="form-group">
                             <label for="expenseDate">Дата</label>
                             <input type="date" class="form-control" id="expenseDate" name="date" required>
@@ -171,7 +171,7 @@
         </div>
 
         <div class="mb-4">
-            <form th:action="@{http://api-gateway/expenses/user-expenses}" method="get">
+            <form th:action="@{/expenses/user-expenses}" method="get">
                 <button type="submit" class="btn btn-custom">Посмотреть все расходы</button>
             </form>
         </div>

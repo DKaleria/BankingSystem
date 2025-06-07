@@ -73,7 +73,7 @@
 
 <div class="container mt-5">
     <h1 class="mb-4 text-center" style="color: #212529;">Регистрация</h1>
-    <form id="registrationForm" action="http://identity-service/identity/register" method="post" class="registration-form">
+    <form id="registrationForm" action="/identity/register" method="post" class="registration-form">
         <div class="form-group">
             <label for="username">Имя пользователя:</label>
             <input type="text" class="form-control" id="username" name="username" required>
@@ -142,18 +142,5 @@
             return false;
         }
 
-        if (!/\S+@\S+\.\S+/.test(email)) {
-            errorMessageElem.innerText = 'Неверный формат электронной почты';
-            event.preventDefault();
-            return false;
-        }
-
-        return true;
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('registrationForm').addEventListener('submit', validateForm);
-    });
-</script>
 </body>
 </html>
