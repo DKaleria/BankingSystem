@@ -30,7 +30,7 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public Income createIncome(Income income) {
-        String birthDateUrl = "http://http://api-gateway/accounts/" + income.getUsername() + "/birthdate";
+        String birthDateUrl = "http://localhost:8082/accounts/" + income.getUsername() + "/birthdate";
         ResponseEntity<LocalDate> response = restTemplate.getForEntity(birthDateUrl, LocalDate.class);
 
         if (response.getStatusCode().isError() || response.getBody() == null) {

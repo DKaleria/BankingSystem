@@ -13,8 +13,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final RestTemplate restTemplate;
 
-    private static final String INCOME_URL_TEMPLATE = "http://api-gateway/incomes/%s/all?month=%d&year=%d";
-    private static final String EXPENSE_URL_TEMPLATE = "http://api-gateway/expenses/%s/all?month=%d&year=%d";
+    private static final String INCOME_URL_TEMPLATE = "http://localhost:8082/incomes/%s/all?month=%d&year=%d";
+    private static final String EXPENSE_URL_TEMPLATE = "http://localhost:8082/expenses/%s/all?month=%d&year=%d";
 
     public AnalysisServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -22,10 +22,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     public BigDecimal getTotalBalance(String username, int month, int year) {
         try {
-            String incomeUrl = String.format("http://api-gateway/incomes/%s/total?month=%d&year=%d", username, month, year);
+            String incomeUrl = String.format("http://localhost:8082/incomes/%s/total?month=%d&year=%d", username, month, year);
             BigDecimal totalIncome = getResponse(incomeUrl);
 
-            String expenseUrl = String.format("http://api-gateway/expenses/%s/total?month=%d&year=%d", username, month, year);
+            String expenseUrl = String.format("http://localhost:8082/expenses/%s/total?month=%d&year=%d", username, month, year);
             BigDecimal totalExpense = getResponse(expenseUrl);
 
             return totalIncome.subtract(totalExpense);
@@ -62,12 +62,12 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     private BigDecimal getTotalIncome(String username, int month, int year) {
-        String incomeUrl = String.format("http://api-gateway/incomes/%s/total?month=%d&year=%d", username, month, year);
+        String incomeUrl = String.format("http://localhost:8082/incomes/%s/total?month=%d&year=%d", username, month, year);
         return getResponse(incomeUrl);
     }
 
     private BigDecimal getTotalExpense(String username, int month, int year) {
-        String expenseUrl = String.format("http://api-gateway/expenses/%s/total?month=%d&year=%d", username, month, year);
+        String expenseUrl = String.format("http://localhost:8082/expenses/%s/total?month=%d&year=%d", username, month, year);
         return getResponse(expenseUrl);
     }
 

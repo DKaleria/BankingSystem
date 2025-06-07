@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface IncomeRepository extends JpaRepository<Income, Long> {
 
-    List<Income> findByUsername(String username); // ✅ Запрос доходов по `username`
+    List<Income> findByUsername(String username);
 
     @Query("SELECT i FROM Income i WHERE i.username = :username AND i.date BETWEEN :startDate AND :endDate")
     List<Income> getIncomesForMonth(@Param("username") String username, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);

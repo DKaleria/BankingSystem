@@ -69,16 +69,16 @@ public class AccountController {
     @GetMapping("/account")
     public String showAccount(@RequestHeader("username") String username, Model model) {
         if (username == null || username.isEmpty()) {
-            return "redirect:http://api-gateway/identity/login";
+            return "redirect:http://localhost:8082/identity/login";
         }
 
         AccountDTO account = accountService.getAccountData(username);
 
         if (!username.equals(account.getUsername())) {
-            return "redirect:http://api-gateway/accounts/" + account.getUsername() + "/account";
+            return "redirect:http://localhost:8082/accounts/" + account.getUsername() + "/account";
         }
 
-        String balanceUrl = "http://api-gateway/accounts/" + username + "/balance";
+        String balanceUrl = "http://localhost:8082/accounts/" + username + "/balance";
         ResponseEntity<BigDecimal> response = restTemplate.getForEntity(balanceUrl, BigDecimal.class);
         BigDecimal totalBalance = response.getBody() != null ? response.getBody() : BigDecimal.ZERO;
 
@@ -102,7 +102,7 @@ public class AccountController {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
 
-        return "http://api-gateway/identity/login";
+        return "http://localhost:8082/identity/login";
     }
 
     @GetMapping("/{username}/balance")
@@ -113,7 +113,7 @@ public class AccountController {
         BigDecimal totalExpense = BigDecimal.ZERO;
 
         try {
-            String incomeUrl = "http://api-gateway/incomes/" + username + "/total";
+            String incomeUrl = "http://localhost:8082/incomes/" + username + "/total";
             ResponseEntity<BigDecimal> incomeResponse = restTemplate.getForEntity(incomeUrl, BigDecimal.class);
             totalIncome = (incomeResponse.getBody() != null) ? incomeResponse.getBody() : BigDecimal.ZERO;
         } catch (Exception e) {
@@ -121,7 +121,7 @@ public class AccountController {
         }
 
         try {
-            String expenseUrl = "http://api-gateway/expenses/" + username + "/total";
+            String expenseUrl = "http://localhost:8082/expenses/" + username + "/total";
             ResponseEntity<BigDecimal> expenseResponse = restTemplate.getForEntity(expenseUrl, BigDecimal.class);
             totalExpense = (expenseResponse.getBody() != null) ? expenseResponse.getBody() : BigDecimal.ZERO;
         } catch (Exception e) {

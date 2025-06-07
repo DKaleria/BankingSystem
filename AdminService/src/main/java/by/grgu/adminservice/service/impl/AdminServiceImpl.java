@@ -14,7 +14,7 @@ import java.util.Map;
 @Service
 public class AdminServiceImpl implements AdminService {
     private final RestTemplate restTemplate;
-    private static final String API_GATEWAY_URL = "http://api-gateway/";
+    private static final String API_GATEWAY_URL = "http://localhost:8082/";
 
     public AdminServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

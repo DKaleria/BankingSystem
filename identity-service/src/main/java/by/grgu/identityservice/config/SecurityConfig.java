@@ -27,8 +27,8 @@ public class SecurityConfig {
         return http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITELIST).permitAll()
-                        .requestMatchers("http://api-gateway/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("http://api-gateway/accounts/**").hasAuthority("USER")
+                        .requestMatchers("http://localhost:8082/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("http://localhost:8082/accounts/**").hasAuthority("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
@@ -41,9 +41,9 @@ public class SecurityConfig {
                                     .orElse("USER");
 
                             if ("ADMIN".equals(role)) {
-                                response.sendRedirect("http://api-gateway/admin/users");
+                                response.sendRedirect("http://localhost:8082/admin/users");
                             } else {
-                                response.sendRedirect("http://api-gateway/accounts/account");
+                                response.sendRedirect("http://localhost:8082/accounts/account");
                             }
                         })
                         .permitAll()
